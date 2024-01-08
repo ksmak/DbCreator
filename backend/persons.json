@@ -1,0 +1,35 @@
+[
+    {
+        "model": "asb.person",
+        "pk": 1,
+        "fields": {
+            "last_name": "Ахметов",
+            "first_name": "Ахмет",
+            "middle_name": "Ахметович",
+            "birth_date": "1981-01-01",
+            "iin": 810101123123
+        }
+    },
+    {
+        "model": "asb.person",
+        "pk": 2,
+        "fields": {
+            "last_name": "Саламатов",
+            "first_name": "Саламат",
+            "middle_name": "Саламатович",
+            "birth_date": "1981-02-02",
+            "iin": 810202123123
+        }
+    },
+    {
+        "model": "asb.person",
+        "pk": 3,
+        "fields": {
+            "last_name": "Арманов",
+            "first_name": "Арман",
+            "middle_name": "Арманович",
+            "birth_date": "1981-03-03",
+            "iin": 810303123123
+        }
+    }
+]
