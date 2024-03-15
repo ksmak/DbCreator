@@ -1,0 +1,235 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  id           Int            @id @default(autoincrement())
+  title_kk     String         
+  title_ru     String         
+  users        User[]
+}
+
+model Role {
+  id           Int            @id @default(autoincrement())
+  title_kk     String         
+  title_ru     String         
+  accessInput  AccessInputForm[]
+  accessSearch AccessSearchForm[]
+  userRoles    UserRole[]
+}
+
+enum AccessType {
+  READ
+  WRITE
+  DELETE
+}
+
+model AccessInputForm {
+  id           Int            @id @default(autoincrement())
+  role         Role           @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId       Int
+  form         InputForm?     @relation(fields: [formId], references: [id], onDelete: SetNull)
+  formId       Int?
+  accessType   AccessType     @default(READ)
+}
+
+model AccessSearchForm {
+  id           Int            @id @default(autoincrement())
+  role         Role           @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId       Int
+  form         SearchForm?    @relation(fields: [formId], references: [id], onDelete: SetNull)
+  formId       Int?
+  accessType   AccessType     @default(READ)
+}
+
+model UserRole {
+  id           Int            @id @default(autoincrement())
+  user         User           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId       Int
+  role         Role?          @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  roleId       Int?
+}
+
+model User {
+  id           Int            @id @default(autoincrement())
+  isActive     Boolean        @default(true)
+  login        String         @unique
+  password     String
+  firstName    String?
+  lastName     String?
+  middleName   String?
+  department   Department?    @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  departmentId Int?
+  expiredPwd   DateTime?
+  createdAt    DateTime?      @default(now())
+  updatedAt    DateTime?      @updatedAt
+  roles        UserRole[]
+  queries      Query[]
+  createDoc    Doc[]          @relation(name: "createDoc")
+  updateDoc    Doc[]          @relation(name: "updateDoc")
+}
+
+model Dictionary {
+  id           Int            @id @default(autoincrement())
+  title_kk     String         
+  title_ru     String         
+  fields       InputField[]
+}
+
+model InputForm {
+  id           Int            @id @default(autoincrement())
+  pos          Int            @default(0)
+  title_kk     String         
+  title_ru     String         
+  groups       Group[]
+  access       AccessInputForm[]
+  docs         Doc[]
+}
+
+model SearchForm {
+  id           Int            @id @default(autoincrement())
+  pos          Int            @default(0)
+  title_kk     String         
+  title_ru     String         
+  fields       SearchField[]
+  access       AccessSearchForm[]
+}
+
+model Group {
+  id           Int            @id @default(autoincrement())
+  pos          Int            @default(0)
+  title_kk     String         
+  title_ru     String         
+  inputForm    InputForm      @relation(fields: [inputFormId], references: [id], onDelete: Cascade)
+  inputFormId  Int
+  isMulty      Boolean        @default(false)
+  fields       InputField[]
+}
+
+enum FieldType {
+  TEXT
+  CYRILLIC
+  INTEGER
+  NUMERIC
+  DICT
+  DATE
+  TIME
+  FILE
+}
+
+model InputField {
+  id           Int            @id @default(autoincrement())
+  pos          Int            @default(0)
+  colSpan      Int            @default(1)
+  colStart     Int            @default(1)
+  title_kk     String         
+  title_ru     String         
+  group        Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId      Int
+  fieldType    FieldType      @default(TEXT)
+  dictionary   Dictionary?    @relation(fields: [dicId], references: [id], onDelete: SetNull)
+  dicId        Int?
+  len          Int            @default(0)
+  isKey        Boolean        @default(false)
+  isVisible    Boolean        @default(true)
+  isEnable     Boolean        @default(true)
+  isRequire    Boolean        @default(false)
+  precision    Int            @default(0)
+  isDuplicate  Boolean        @default(false)
+  searchField  SearchField[]
+  conditions   Condition[]
+}
+
+model SearchField {
+  id           Int            @id @default(autoincrement())
+  pos          Int            @default(0)
+  title_kk     String         
+  title_ru     String         
+  searchForm   SearchForm     @relation(fields: [searchFormId], references: [id], onDelete: Cascade)
+  searchFormId Int
+  field        InputField?    @relation(fields: [fieldId], references: [id], onDelete: SetNull)
+  fieldId      Int?
+}
+
+model Report {
+  id           Int            @id @default(autoincrement())
+  pos          Int            @default(0)
+  title_kk     String         
+  title_ru     String         
+  template     String
+  start_row    Int            @default(1)
+  start_col    Int            @default(1)
+  cols         ReportCol[]
+}
+
+model ReportCol {
+  id           Int            @id @default(autoincrement())
+  pos          Int            @default(1)
+  report       Report         @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reportId     Int
+  query        Query?         @relation(fields: [queryId], references: [id], onDelete: SetNull)
+  queryId      Int?
+  rows         ReportRow[]
+}
+
+model ReportRow {
+  id           Int            @id @default(autoincrement())
+  pos          Int            @default(1)
+  col          ReportCol      @relation(fields: [colId], references: [id], onDelete: Cascade)
+  colId        Int
+  query        Query?         @relation(fields: [queryId], references: [id], onDelete: SetNull)
+  queryId      Int?
+}
+
+model Query {
+  id           Int            @id @default(autoincrement())
+  title_kk     String?         
+  title_ru     String?        
+  user         User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId       Int?
+  isPublic     Boolean        @default(false)
+  cols         ReportCol[]
+  rows         ReportRow[]
+  conditions   Condition[]
+}
+
+model Condition {
+  id           Int            @id @default(autoincrement())
+  query        Query          @relation(fields: [queryId], references: [id], onDelete: Cascade)
+  queryId      Int
+  log          String?
+  field        InputField?    @relation(fields: [fieldId], references: [id], onDelete: SetNull)
+  fieldId      Int?
+  oper         String?
+  valList      ValList[]
+}
+
+model ValList {
+  id           Int            @id @default(autoincrement())
+  cond         Condition      @relation(fields: [condId], references: [id], onDelete: Cascade)
+  condId       Int
+  value        String
+}
+
+model Doc {
+  id            Int            @id
+  form          InputForm      @relation(fields: [formId], references: [id], onDelete: Restrict)
+  formId        Int
+  isActive      Boolean        @default(true)
+  dateStart     DateTime?      @default(now()) 
+  dateEnd       DateTime?
+  createdAt     DateTime?      @default(now())
+  updatedAt     DateTime?      @updatedAt
+  createdUser   User           @relation(fields: [createdUserId], references: [id], name: "createDoc")
+  createdUserId Int
+  updatedUser   User?          @relation(fields: [updatedUserId], references: [id], name: "updateDoc")
+  updatedUserId Int?
+}
