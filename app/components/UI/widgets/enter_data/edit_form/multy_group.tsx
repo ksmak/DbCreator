@@ -50,7 +50,7 @@ export default function MultyGroup({
     return (
         <div className="border p-1 flex flex-col gap-3">
             <div className="mt-2">
-                {state === 'create'
+                {state === 'create' || state === 'edit'
                     ? <CustomButton
                         className="bg-primary hover:shadow-primary_shadow"
                         onClick={handleCreate}

@@ -25,30 +25,15 @@ export async function action({
     let errors: string = ''
     let docs: { formId?: number, ids?: number[] } | null = null
     let deletedDocId: number | null = null
-    // const handler = unstable_createFileUploadHandler({
-    //     directory: `${process.cwd()}/public/uploads`,
-    //     file: ({ filename }) => filename,
-    //     maxPartSize: 50_000_000
-    // });
-    // const uploadHandler = unstable_composeUploadHandlers(
-    //     async ({ name, data }) => {
-    //         return "url";
-    //     },
-    //     unstable_createMemoryUploadHandler()
-    // );
     const uploadHandler = unstable_composeUploadHandlers(
         unstable_createFileUploadHandler({
             directory: `${process.cwd()}/public/uploads`,
             file: ({ filename }) => filename,
             maxPartSize: 50_000_000
         }),
-        // parse everything else into memory
         unstable_createMemoryUploadHandler()
     );
     const formData = await unstable_parseMultipartFormData(request, uploadHandler);
-    console.log(formData)
-    // const file = formData.get("file") as File;
-    // const formData = await request.formData()
     const {
         _action,
         _user,
@@ -56,19 +41,17 @@ export async function action({
         _id,
         ...values
     } = Object.fromEntries(formData)
-    console.log(values)
     switch (_action) {
         case 'saveDocument': {
             try {
-                // let inputForm = await api.db.getInputForm(Number(_inputFormId))
-                // let jsonData = JSON.parse(String(values.json))
-                // if (_id) {
-                //     await api.doc.updateDoc(Number(_user), inputForm, jsonData)
-                //     return redirect(`/dashboard/enter_data/${_inputFormId}?docId=${_id}`)
-                // } else {
-                //     await api.doc.createDoc(Number(_user), inputForm, jsonData)
-                //     return redirect(`/dashboard/enter_data/${_inputFormId}`)
-                // }
+                let inputForm = await api.db.getInputForm(Number(_inputFormId))
+                if (_id) {
+                    await api.doc.updateDoc(Number(_user), inputForm, formData, Number(_id))
+                    return redirect(`/dashboard/enter_data/${_inputFormId}?docId=${_id}`)
+                } else {
+                    await api.doc.createDoc(Number(_user), inputForm, formData)
+                    return redirect(`/dashboard/enter_data/${_inputFormId}`)
+                }
             } catch (e) {
                 if (e instanceof Prisma.PrismaClientKnownRequestError) {
                     errors = e.message
@@ -81,8 +64,7 @@ export async function action({
         case 'findDocument': {
             try {
                 let inputForm = await api.db.getInputForm(Number(_inputFormId))
-                let jsonData = JSON.parse(String(values.json))
-                const results: { id: number }[] | [] = await api.doc.findDoc(inputForm, jsonData)
+                const results: { id: number }[] | [] = await api.doc.findDoc(inputForm, formData)
                 if (results.length > 100) {
                     errors = "Find records more 100"
                 } else {
@@ -132,6 +114,7 @@ export default function EnterData() {
     const [showFind, setShowFind] = useState(false)
 
     useEffect(() => {
+        formRef.current?.reset()
         setDocument(doc)
     }, [doc])
 

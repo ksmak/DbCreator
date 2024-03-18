@@ -7,7 +7,7 @@ import {
   Panel,
   require_index_browser,
   require_node
-} from "/build/_shared/chunk-QI3KDWHL.js";
+} from "/build/_shared/chunk-RAAIBPHZ.js";
 import {
   require_react
 } from "/build/_shared/chunk-Z46RVADL.js";
@@ -2120,4 +2120,4 @@ window.$RefreshSig$ = prevRefreshSig;
 export {
   DbStruct as default
 };
-//# sourceMappingURL=/build/routes/dashboard.db_struct-V27XHE5W.js.map
+//# sourceMappingURL=/build/routes/dashboard.db_struct-QZEH5X42.js.map

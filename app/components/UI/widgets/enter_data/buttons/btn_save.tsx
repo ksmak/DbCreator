@@ -1,32 +1,11 @@
 import { useTranslation } from "react-i18next";
 import CustomButton from "~/components/UI/elements/custom_button";
-import { useSubmit } from "@remix-run/react";
 
-type ButtonSaveProps = {
-    userId: number,
-    inputFormId: number,
-    doc: any
-}
-
-export default function ButtonSave({ userId, inputFormId, doc }: ButtonSaveProps) {
+export default function ButtonSave() {
     const { t } = useTranslation()
-    // const submit = useSubmit()
-
-    // const handleSave = () => {
-    //     submit({
-    //         _action: "saveDocument",
-    //         _user: userId ? userId : '',
-    //         _inputFormId: inputFormId ? inputFormId : '',
-    //         _id: doc.id ? doc.id : '',
-    //         json: JSON.stringify(doc)
-    //     }, {
-    //         method: "post",
-    //     })
-    // }
     return (
         <CustomButton
             className="bg-primary hover:shadow-primary_shadow"
-            // onClick={() => handleSave()}
             form="documentForm"
             type="submit"
             name="_action"

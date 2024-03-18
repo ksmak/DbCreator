@@ -1,6 +1,7 @@
 import {
-  CustomSelect
-} from "/build/_shared/chunk-UKC5B2IM.js";
+  CustomSelect,
+  require_moment
+} from "/build/_shared/chunk-MXYI6LSU.js";
 import {
   CustomInput
 } from "/build/_shared/chunk-KJDVWT2A.js";
@@ -9,7 +10,7 @@ import {
   ErrorMessage,
   Panel,
   require_node
-} from "/build/_shared/chunk-QI3KDWHL.js";
+} from "/build/_shared/chunk-RAAIBPHZ.js";
 import {
   require_react as require_react2
 } from "/build/_shared/chunk-Z46RVADL.js";
@@ -43,10 +44,10 @@ import {
 
 // app/routes/dashboard.enter_data.$formId.tsx
 var import_node = __toESM(require_node(), 1);
-var import_react15 = __toESM(require_react(), 1);
+var import_react14 = __toESM(require_react(), 1);
 
 // app/components/UI/widgets/enter_data/view.tsx
-var import_react13 = __toESM(require_react(), 1);
+var import_react12 = __toESM(require_react(), 1);
 
 // app/components/UI/widgets/enter_data/buttons/btn_cancel.tsx
 var import_jsx_dev_runtime = __toESM(require_jsx_dev_runtime(), 1);
@@ -181,7 +182,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/buttons/btn_delete.tsx"
   );
-  import.meta.hot.lastModified = "1709721299382.679";
+  import.meta.hot.lastModified = "1710744853562.776";
 }
 function ButtonDelete({
   userId,
@@ -193,7 +194,7 @@ function ButtonDelete({
     t
   } = useTranslation();
   const handleDelete = async (event) => {
-    const response = confirm("Please confirm you want to delete this record.");
+    const response = confirm(t("confirm_delete"));
     if (!response) {
       event.preventDefault();
     }
@@ -265,7 +266,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/buttons/btn_edit.tsx"
   );
-  import.meta.hot.lastModified = "1710333943178.783";
+  import.meta.hot.lastModified = "1710735478504.2424";
 }
 function ButtonEdit({
   inputFormId,
@@ -322,48 +323,32 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/buttons/btn_find.tsx"
   );
-  import.meta.hot.lastModified = "1709721316399.276";
+  import.meta.hot.lastModified = "1710740134497.0242";
 }
-function ButtonFind({
-  userId,
-  inputFormId,
-  doc
-}) {
+function ButtonFind() {
   _s5();
   const {
     t
   } = useTranslation();
-  const submit = useSubmit();
-  const handleFind = () => {
-    submit({
-      _action: "findDocument",
-      _user: userId,
-      _inputFormId: inputFormId,
-      _id: doc.id ? doc.id : "",
-      json: JSON.stringify(document)
-    }, {
-      method: "post"
-    });
-  };
-  return /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(CustomButton, { className: "bg-blue-gray-500 hover:shadow-blue-gray-100", onClick: () => handleFind(), children: [
+  return /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)(CustomButton, { className: "bg-blue-gray-500 hover:shadow-blue-gray-100", form: "documentForm", type: "submit", name: "_action", value: "findDocument", children: [
     /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ (0, import_jsx_dev_runtime5.jsxDEV)("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/buttons/btn_find.tsx",
-      lineNumber: 48,
+      lineNumber: 31,
       columnNumber: 17
     }, this) }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/buttons/btn_find.tsx",
-      lineNumber: 47,
+      lineNumber: 30,
       columnNumber: 13
     }, this),
     t("find")
   ] }, void 0, true, {
     fileName: "app/components/UI/widgets/enter_data/buttons/btn_find.tsx",
-    lineNumber: 46,
+    lineNumber: 29,
     columnNumber: 10
   }, this);
 }
-_s5(ButtonFind, "6b9drngkmiq9KhFUfrO+O1zoj50=", false, function() {
-  return [useTranslation, useSubmit];
+_s5(ButtonFind, "zlIdU9EjM2llFt74AbE2KsUJXyM=", false, function() {
+  return [useTranslation];
 });
 _c5 = ButtonFind;
 var _c5;
@@ -391,47 +376,29 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/buttons/btn_save.tsx"
   );
-  import.meta.hot.lastModified = "1710479147892.417";
+  import.meta.hot.lastModified = "1710587971324.9219";
 }
-function ButtonSave({
-  userId,
-  inputFormId,
-  doc
-}) {
+function ButtonSave() {
   _s6();
   const {
     t
   } = useTranslation();
-  return /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(
-    CustomButton,
-    {
-      className: "bg-primary hover:shadow-primary_shadow",
-      form: "documentForm",
-      type: "submit",
-      name: "_action",
-      value: "saveDocument",
-      children: [
-        /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5" }, void 0, false, {
-          fileName: "app/components/UI/widgets/enter_data/buttons/btn_save.tsx",
-          lineNumber: 50,
-          columnNumber: 17
-        }, this) }, void 0, false, {
-          fileName: "app/components/UI/widgets/enter_data/buttons/btn_save.tsx",
-          lineNumber: 49,
-          columnNumber: 13
-        }, this),
-        t("save")
-      ]
-    },
-    void 0,
-    true,
-    {
+  return /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(CustomButton, { className: "bg-primary hover:shadow-primary_shadow", form: "documentForm", type: "submit", name: "_action", value: "saveDocument", children: [
+    /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m4.5 5.25 7.5 7.5 7.5-7.5m-15 6 7.5 7.5 7.5-7.5" }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/buttons/btn_save.tsx",
-      lineNumber: 46,
-      columnNumber: 10
-    },
-    this
-  );
+      lineNumber: 31,
+      columnNumber: 17
+    }, this) }, void 0, false, {
+      fileName: "app/components/UI/widgets/enter_data/buttons/btn_save.tsx",
+      lineNumber: 30,
+      columnNumber: 13
+    }, this),
+    t("save")
+  ] }, void 0, true, {
+    fileName: "app/components/UI/widgets/enter_data/buttons/btn_save.tsx",
+    lineNumber: 29,
+    columnNumber: 10
+  }, this);
 }
 _s6(ButtonSave, "zlIdU9EjM2llFt74AbE2KsUJXyM=", false, function() {
   return [useTranslation];
@@ -517,7 +484,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/buttons/buttons.tsx"
   );
-  import.meta.hot.lastModified = "1710389998442.054";
+  import.meta.hot.lastModified = "1710733553907.5867";
 }
 function Buttons({
   userId,
@@ -536,7 +503,7 @@ function Buttons({
       lineNumber: 36,
       columnNumber: 70
     }, this) : null,
-    state === "search" ? /* @__PURE__ */ (0, import_jsx_dev_runtime8.jsxDEV)(ButtonFind, { userId, inputFormId, doc }, void 0, false, {
+    state === "search" ? /* @__PURE__ */ (0, import_jsx_dev_runtime8.jsxDEV)(ButtonFind, {}, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/buttons/buttons.tsx",
       lineNumber: 37,
       columnNumber: 35
@@ -546,7 +513,7 @@ function Buttons({
       lineNumber: 38,
       columnNumber: 70
     }, this) : null,
-    state === "edit" || state === "create" ? /* @__PURE__ */ (0, import_jsx_dev_runtime8.jsxDEV)(ButtonSave, { userId, inputFormId, doc }, void 0, false, {
+    state === "edit" || state === "create" ? /* @__PURE__ */ (0, import_jsx_dev_runtime8.jsxDEV)(ButtonSave, {}, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/buttons/buttons.tsx",
       lineNumber: 39,
       columnNumber: 55
@@ -574,7 +541,7 @@ window.$RefreshReg$ = prevRefreshReg;
 window.$RefreshSig$ = prevRefreshSig;
 
 // app/components/UI/widgets/enter_data/dlg_find_result.tsx
-var import_react7 = __toESM(require_react2(), 1);
+var import_react6 = __toESM(require_react2(), 1);
 var import_jsx_dev_runtime9 = __toESM(require_jsx_dev_runtime(), 1);
 if (!window.$RefreshReg$ || !window.$RefreshSig$ || !window.$RefreshRuntime$) {
   console.warn("remix:hmr: React Fast Refresh only works when the Remix compiler is running in development mode.");
@@ -594,14 +561,14 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/dlg_find_result.tsx"
   );
-  import.meta.hot.lastModified = "1709721343144.205";
+  import.meta.hot.lastModified = "1710750896309.148";
 }
 var {
   Dialog,
   Card,
   CardBody,
   CardFooter
-} = import_react7.default;
+} = import_react6.default;
 function DialogFindResult({
   open,
   setOpen,
@@ -620,42 +587,55 @@ function DialogFindResult({
       navigate(`/dashboard/enter_data/${docs.formId}?state=search`);
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(Dialog, { placeholder: "", size: "sm", open, handler: () => handleOpenInputForm(), className: "bg-transparent shadow-none", children: /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(Card, { className: "mx-auto w-full", placeholder: "", children: [
-    /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(CardBody, { className: "flex flex-col gap-4 overflow-auto", placeholder: "", children: docs && docs.ids?.length ? /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)("div", { className: "text-bold p-1", children: [
-      t("find_result"),
-      ": ",
-      docs.ids?.length
-    ] }, void 0, true, {
+  return /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(
+    Dialog,
+    {
+      placeholder: "",
+      size: "xs",
+      open,
+      className: "bg-transparent shadow-none",
+      children: /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(Card, { className: "mx-auto w-full", placeholder: "", children: [
+        /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(CardBody, { className: "flex flex-col gap-4 overflow-auto", placeholder: "", children: docs && docs.ids?.length ? /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)("div", { className: "font-bold text-lg p-1 text-primary text-center", children: [
+          t("find_result"),
+          " ",
+          docs.ids?.length
+        ] }, void 0, true, {
+          fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
+          lineNumber: 55,
+          columnNumber: 49
+        }, this) : /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)("div", { className: "text-bold p-1", children: t("nothing") }, void 0, false, {
+          fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
+          lineNumber: 55,
+          columnNumber: 159
+        }, this) }, void 0, false, {
+          fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
+          lineNumber: 54,
+          columnNumber: 17
+        }, this),
+        /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(CardFooter, { className: "pt-0 flex flex-row gap-3 justify-center", placeholder: "", children: /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(CustomButton, { className: "bg-primary hover:shadow-primary_shadow w-40", onClick: () => handleOpenInputForm(), children: "OK" }, void 0, false, {
+          fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
+          lineNumber: 59,
+          columnNumber: 21
+        }, this) }, void 0, false, {
+          fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
+          lineNumber: 58,
+          columnNumber: 17
+        }, this)
+      ] }, void 0, true, {
+        fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
+        lineNumber: 53,
+        columnNumber: 13
+      }, this)
+    },
+    void 0,
+    false,
+    {
       fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
-      lineNumber: 53,
-      columnNumber: 49
-    }, this) : /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)("div", { className: "text-bold p-1", children: t("nothing") }, void 0, false, {
-      fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
-      lineNumber: 53,
-      columnNumber: 127
-    }, this) }, void 0, false, {
-      fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
-      lineNumber: 52,
-      columnNumber: 17
-    }, this),
-    /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(CardFooter, { className: "pt-0 flex flex-row gap-3 justify-center", placeholder: "", children: /* @__PURE__ */ (0, import_jsx_dev_runtime9.jsxDEV)(CustomButton, { className: "bg-green-500 hover:shadow-green-100", onClick: () => handleOpenInputForm(), children: "OK" }, void 0, false, {
-      fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
-      lineNumber: 57,
-      columnNumber: 21
-    }, this) }, void 0, false, {
-      fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
-      lineNumber: 56,
-      columnNumber: 17
-    }, this)
-  ] }, void 0, true, {
-    fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
-    lineNumber: 51,
-    columnNumber: 13
-  }, this) }, void 0, false, {
-    fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
-    lineNumber: 50,
-    columnNumber: 10
-  }, this);
+      lineNumber: 50,
+      columnNumber: 10
+    },
+    this
+  );
 }
 _s8(DialogFindResult, "1n6r5eWNKhP/dvqdbLCphpT4ddM=", false, function() {
   return [useTranslation, useNavigate];
@@ -666,8 +646,8 @@ $RefreshReg$(_c9, "DialogFindResult");
 window.$RefreshReg$ = prevRefreshReg;
 window.$RefreshSig$ = prevRefreshSig;
 
-// app/components/UI/widgets/enter_data/rec_navigator.tsx
-var import_react10 = __toESM(require_react(), 1);
+// app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx
+var import_react9 = __toESM(require_react(), 1);
 var import_jsx_dev_runtime10 = __toESM(require_jsx_dev_runtime(), 1);
 if (!window.$RefreshReg$ || !window.$RefreshSig$ || !window.$RefreshRuntime$) {
   console.warn("remix:hmr: React Fast Refresh only works when the Remix compiler is running in development mode.");
@@ -675,7 +655,7 @@ if (!window.$RefreshReg$ || !window.$RefreshSig$ || !window.$RefreshRuntime$) {
   prevRefreshReg = window.$RefreshReg$;
   prevRefreshSig = window.$RefreshSig$;
   window.$RefreshReg$ = (type, id) => {
-    window.$RefreshRuntime$.register(type, '"app/components/UI/widgets/enter_data/rec_navigator.tsx"' + id);
+    window.$RefreshRuntime$.register(type, '"app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx"' + id);
   };
   window.$RefreshSig$ = window.$RefreshRuntime$.createSignatureFunctionForTransform;
 }
@@ -685,9 +665,9 @@ var _s9 = $RefreshSig$();
 if (import.meta) {
   import.meta.hot = createHotContext(
     //@ts-expect-error
-    "app/components/UI/widgets/enter_data/rec_navigator.tsx"
+    "app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx"
   );
-  import.meta.hot.lastModified = "1708944139413.033";
+  import.meta.hot.lastModified = "1710750590658.6624";
 }
 function RecNavigator({
   docs,
@@ -695,7 +675,10 @@ function RecNavigator({
   setCurrent
 }) {
   _s9();
-  const [val, setVal] = (0, import_react10.useState)(current);
+  const {
+    t
+  } = useTranslation();
+  const [val, setVal] = (0, import_react9.useState)(current);
   const navigate = useNavigate();
   const handleFirst = () => {
     setVal(0);
@@ -742,52 +725,52 @@ function RecNavigator({
       " / ",
       docs.ids.length
     ] }, void 0, true, {
-      fileName: "app/components/UI/widgets/enter_data/rec_navigator.tsx",
-      lineNumber: 73,
-      columnNumber: 21
-    }, this),
-    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("input", { className: "p-1 text-blue-gray-600 focus:outline-0 w-20", type: "number", max: docs.ids.length, min: 1, value: val + 1, onChange: (e) => setVal(Number(e.target.value) - 1) }, void 0, false, {
-      fileName: "app/components/UI/widgets/enter_data/rec_navigator.tsx",
-      lineNumber: 76,
-      columnNumber: 21
-    }, this),
-    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("button", { className: "w-20 text-center border bg-blue-gray-500 p-1 font-bold text-white rounded", onClick: () => handleSeek(val), children: "Seek" }, void 0, false, {
-      fileName: "app/components/UI/widgets/enter_data/rec_navigator.tsx",
+      fileName: "app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx",
       lineNumber: 77,
       columnNumber: 21
     }, this),
-    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("button", { className: "w-8 text-center border bg-orange-700 p-1 font-bold text-white rounded", onClick: () => handleFirst(), children: "<<" }, void 0, false, {
-      fileName: "app/components/UI/widgets/enter_data/rec_navigator.tsx",
+    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("input", { className: "ml-1 p-1 text-primary focus:outline-0 w-20 border border-primary rounded", type: "number", max: docs.ids.length, min: 1, value: val + 1, onChange: (e) => setVal(Number(e.target.value) - 1) }, void 0, false, {
+      fileName: "app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx",
       lineNumber: 80,
       columnNumber: 21
     }, this),
-    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("button", { className: "w-8 text-center border bg-orange-700 p-1 font-bold text-white rounded", onClick: () => handlePrev(), children: "<" }, void 0, false, {
-      fileName: "app/components/UI/widgets/enter_data/rec_navigator.tsx",
-      lineNumber: 83,
+    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("button", { className: "w-20 text-center border bg-secondary p-1 font-bold text-white rounded", onClick: () => handleSeek(val), children: t("seek") }, void 0, false, {
+      fileName: "app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx",
+      lineNumber: 81,
       columnNumber: 21
     }, this),
-    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("button", { className: "w-8 text-center border bg-orange-700 p-1 font-bold text-white rounded", onClick: () => handleNext(), children: ">" }, void 0, false, {
-      fileName: "app/components/UI/widgets/enter_data/rec_navigator.tsx",
-      lineNumber: 86,
+    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("button", { className: "w-8 text-center border bg-secondary p-1 font-bold text-white rounded", onClick: () => handleFirst(), children: "<<" }, void 0, false, {
+      fileName: "app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx",
+      lineNumber: 84,
       columnNumber: 21
     }, this),
-    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("button", { className: "w-8 text-center border bg-orange-700 p-1 font-bold text-white rounded", onClick: () => handleLast(), children: ">>" }, void 0, false, {
-      fileName: "app/components/UI/widgets/enter_data/rec_navigator.tsx",
-      lineNumber: 89,
+    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("button", { className: "w-8 text-center border bg-secondary p-1 font-bold text-white rounded", onClick: () => handlePrev(), children: "<" }, void 0, false, {
+      fileName: "app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx",
+      lineNumber: 87,
+      columnNumber: 21
+    }, this),
+    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("button", { className: "w-8 text-center border bg-secondary p-1 font-bold text-white rounded", onClick: () => handleNext(), children: ">" }, void 0, false, {
+      fileName: "app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx",
+      lineNumber: 90,
+      columnNumber: 21
+    }, this),
+    /* @__PURE__ */ (0, import_jsx_dev_runtime10.jsxDEV)("button", { className: "w-8 text-center border bg-secondary p-1 font-bold text-white rounded", onClick: () => handleLast(), children: ">>" }, void 0, false, {
+      fileName: "app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx",
+      lineNumber: 93,
       columnNumber: 21
     }, this)
   ] }, void 0, true, {
-    fileName: "app/components/UI/widgets/enter_data/rec_navigator.tsx",
-    lineNumber: 72,
+    fileName: "app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx",
+    lineNumber: 76,
     columnNumber: 33
   }, this) : null }, void 0, false, {
-    fileName: "app/components/UI/widgets/enter_data/rec_navigator.tsx",
-    lineNumber: 71,
+    fileName: "app/components/UI/widgets/enter_data/edit_form/rec_navigator.tsx",
+    lineNumber: 75,
     columnNumber: 10
   }, this);
 }
-_s9(RecNavigator, "bRS7YemhOiQ/UMD2eufTNCWGMz4=", false, function() {
-  return [useNavigate];
+_s9(RecNavigator, "8fBEyI2WTmsxmx34svgAPxx7G5w=", false, function() {
+  return [useTranslation, useNavigate];
 });
 _c10 = RecNavigator;
 var _c10;
@@ -796,6 +779,7 @@ window.$RefreshReg$ = prevRefreshReg;
 window.$RefreshSig$ = prevRefreshSig;
 
 // app/components/UI/widgets/enter_data/edit_form/field.tsx
+var import_moment = __toESM(require_moment(), 1);
 var import_jsx_dev_runtime11 = __toESM(require_jsx_dev_runtime(), 1);
 if (!window.$RefreshReg$ || !window.$RefreshSig$ || !window.$RefreshRuntime$) {
   console.warn("remix:hmr: React Fast Refresh only works when the Remix compiler is running in development mode.");
@@ -815,7 +799,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/edit_form/field.tsx"
   );
-  import.meta.hot.lastModified = "1710505900653.1523";
+  import.meta.hot.lastModified = "1710742191518.8323";
 }
 function Field({
   state,
@@ -828,7 +812,7 @@ function Field({
   fieldRequired,
   fieldDisabled,
   fieldDict,
-  val
+  defaultVal
 }) {
   _s10();
   const {
@@ -836,67 +820,67 @@ function Field({
   } = useTranslation();
   switch (fieldType) {
     case "TEXT":
-      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "text", name: fieldName, defaultValue: val, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
+      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "text", name: fieldName, defaultValue: defaultVal, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
         fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-        lineNumber: 44,
+        lineNumber: 45,
         columnNumber: 14
       }, this);
     case "CYRILLIC":
-      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "text", name: fieldName, defaultValue: val, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
+      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "text", name: fieldName, defaultValue: defaultVal, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
         fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-        lineNumber: 46,
+        lineNumber: 47,
         columnNumber: 14
       }, this);
     case "INTEGER":
-      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "number", name: fieldName, defaultValue: val, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
+      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "number", name: fieldName, defaultValue: defaultVal, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
         fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-        lineNumber: 48,
+        lineNumber: 49,
         columnNumber: 14
       }, this);
     case "NUMERIC":
-      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "number", step: "0.01", name: fieldName, defaultValue: val, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
+      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "number", step: "0.01", name: fieldName, defaultValue: defaultVal, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
         fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-        lineNumber: 50,
+        lineNumber: 51,
         columnNumber: 14
       }, this);
     case "DICT":
       const dic = dictionaries.find((item) => item.id === fieldDict);
-      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomSelect, { className: cls, id: fieldName, title: fieldTitle, name: fieldName, defaultValue: val, required: fieldRequired, disabled: fieldDisabled, children: [
+      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomSelect, { className: cls, id: fieldName, title: fieldTitle, name: fieldName, defaultValue: defaultVal, required: fieldRequired, disabled: fieldDisabled, children: [
         /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)("option", { children: "-" }, void 0, false, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 54,
+          lineNumber: 55,
           columnNumber: 21
         }, this),
         ["create", "edit", "search", "find"].includes(String(state)) ? dic?.data_edit.map((item) => /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)("option", { value: item.id, children: item[`title_${i18n.language}`] }, item.id, false, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 55,
+          lineNumber: 56,
           columnNumber: 112
         }, this)) : dic?.data_browse.map((item) => /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)("option", { value: item.id, children: item[`title_${i18n.language}`] }, item.id, false, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 55,
+          lineNumber: 56,
           columnNumber: 224
         }, this))
       ] }, void 0, true, {
         fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-        lineNumber: 53,
+        lineNumber: 54,
         columnNumber: 14
       }, this);
     case "DATE":
-      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "date", name: fieldName, defaultValue: val, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
+      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "date", name: fieldName, defaultValue: (0, import_moment.default)(defaultVal, "DD.MM.YYYY").format("YYYY-MM-DD"), required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
         fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-        lineNumber: 58,
+        lineNumber: 59,
         columnNumber: 14
       }, this);
     case "TIME":
-      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "time", name: fieldName, defaultValue: val, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
+      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "time", name: fieldName, defaultValue: defaultVal, required: fieldRequired, disabled: fieldDisabled, size: fieldLen, maxLength: fieldLen }, void 0, false, {
         fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-        lineNumber: 60,
+        lineNumber: 61,
         columnNumber: 14
       }, this);
     case "FILE":
-      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "file", name: fieldName, defaultValue: val, required: fieldRequired, disabled: fieldDisabled }, void 0, false, {
+      return /* @__PURE__ */ (0, import_jsx_dev_runtime11.jsxDEV)(CustomInput, { className: cls, id: fieldName, title: fieldTitle, type: "file", name: fieldName, defaultValue: "", required: fieldRequired, disabled: fieldDisabled }, void 0, false, {
         fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-        lineNumber: 62,
+        lineNumber: 63,
         columnNumber: 14
       }, this);
   }
@@ -930,7 +914,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/edit_form/single_group.tsx"
   );
-  import.meta.hot.lastModified = "1710501817190.3591";
+  import.meta.hot.lastModified = "1710736571940.2961";
 }
 function SingleGroup({
   state,
@@ -955,7 +939,7 @@ function SingleGroup({
     if (doc[tableName].length) {
       val = doc[tableName][0][fieldName];
     }
-    return /* @__PURE__ */ (0, import_jsx_dev_runtime12.jsxDEV)(Field, { cls, state, dictionaries, fieldName: `${tableName}__${fieldName}__0`, fieldType: fld.fieldType, fieldTitle, fieldLen, fieldRequired, fieldDisabled, fieldDict: fld.dicId, val }, fld.id, false, {
+    return /* @__PURE__ */ (0, import_jsx_dev_runtime12.jsxDEV)(Field, { cls, state, dictionaries, fieldName: `${tableName}__${fieldName}__0`, fieldType: fld.fieldType, fieldTitle, fieldLen, fieldRequired, fieldDisabled, fieldDict: fld.dicId, defaultVal: val }, fld.id, false, {
       fileName: "app/components/UI/widgets/enter_data/edit_form/single_group.tsx",
       lineNumber: 48,
       columnNumber: 14
@@ -995,7 +979,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx"
   );
-  import.meta.hot.lastModified = "1710504208965.394";
+  import.meta.hot.lastModified = "1710743675745.3887";
 }
 function MultyGroup({
   state,
@@ -1034,7 +1018,7 @@ function MultyGroup({
     setGroup(group);
   };
   return /* @__PURE__ */ (0, import_jsx_dev_runtime13.jsxDEV)("div", { className: "border p-1 flex flex-col gap-3", children: [
-    /* @__PURE__ */ (0, import_jsx_dev_runtime13.jsxDEV)("div", { className: "mt-2", children: state === "create" ? /* @__PURE__ */ (0, import_jsx_dev_runtime13.jsxDEV)(CustomButton, { className: "bg-primary hover:shadow-primary_shadow", onClick: handleCreate, children: [
+    /* @__PURE__ */ (0, import_jsx_dev_runtime13.jsxDEV)("div", { className: "mt-2", children: state === "create" || state === "edit" ? /* @__PURE__ */ (0, import_jsx_dev_runtime13.jsxDEV)(CustomButton, { className: "bg-primary hover:shadow-primary_shadow", onClick: handleCreate, children: [
       /* @__PURE__ */ (0, import_jsx_dev_runtime13.jsxDEV)("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ (0, import_jsx_dev_runtime13.jsxDEV)("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M12 4.5v15m7.5-7.5h-15" }, void 0, false, {
         fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
         lineNumber: 64,
@@ -1048,7 +1032,7 @@ function MultyGroup({
     ] }, void 0, true, {
       fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
       lineNumber: 62,
-      columnNumber: 39
+      columnNumber: 59
     }, this) : null }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
       lineNumber: 61,
@@ -1193,7 +1177,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx"
   );
-  import.meta.hot.lastModified = "1710508455224.814";
+  import.meta.hot.lastModified = "1710744490997.3008";
 }
 function EditForm({
   formRef,
@@ -1212,13 +1196,14 @@ function EditForm({
   } = useTranslation();
   const location = useLocation();
   const submit = useSubmit();
-  const handleSave = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     let formData = new FormData(e.currentTarget);
-    formData.append("_action", "saveDocument");
+    formData.append("_action", e.nativeEvent.submitter.value);
     inputForm?.groups.forEach((group) => {
+      let tableName = `tbl_${group.id}`;
+      formData.append(`${tableName}__count`, doc[tableName].length);
       if (group.isMulty) {
-        let tableName = `tbl_${group.id}`;
         for (let i = 0; i < doc[tableName].length; i++) {
           group.fields.forEach((fld) => {
             let fieldName = `f${fld.id}`;
@@ -1226,56 +1211,60 @@ function EditForm({
             formData.append(r, doc[tableName][i][fieldName]);
           });
         }
-        formData.append(`${tableName}__count`, doc[tableName].length);
       }
     });
+    console.log(Object.fromEntries(formData));
     submit(formData, {
       method: "post",
       encType: "multipart/form-data"
     });
   };
-  return /* @__PURE__ */ (0, import_jsx_dev_runtime14.jsxDEV)("form", { id: "documentForm", method: "post", ref: formRef, onSubmit: handleSave, children: [
+  return /* @__PURE__ */ (0, import_jsx_dev_runtime14.jsxDEV)("div", { children: /* @__PURE__ */ (0, import_jsx_dev_runtime14.jsxDEV)("form", { id: "documentForm", method: "post", ref: formRef, onSubmit: handleSubmit, children: [
     /* @__PURE__ */ (0, import_jsx_dev_runtime14.jsxDEV)("input", { type: "hidden", name: "_user", value: userId }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-      lineNumber: 66,
-      columnNumber: 13
+      lineNumber: 68,
+      columnNumber: 17
     }, this),
     /* @__PURE__ */ (0, import_jsx_dev_runtime14.jsxDEV)("input", { type: "hidden", name: "_inputFormId", value: inputForm.id }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-      lineNumber: 67,
-      columnNumber: 13
+      lineNumber: 69,
+      columnNumber: 17
     }, this),
     /* @__PURE__ */ (0, import_jsx_dev_runtime14.jsxDEV)("input", { type: "hidden", name: "_id", value: doc.id ? doc.id : "" }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-      lineNumber: 68,
-      columnNumber: 13
+      lineNumber: 70,
+      columnNumber: 17
     }, this),
     inputForm?.groups && inputForm.groups.map((group) => {
       let groupTitle = group[`title_${i18n.language}`];
       return /* @__PURE__ */ (0, import_jsx_dev_runtime14.jsxDEV)("div", { className: "mb-2", children: [
         /* @__PURE__ */ (0, import_jsx_dev_runtime14.jsxDEV)("h2", { className: "col-span-3 bg-primary text-white font-bold text-sm p-1 pl-4", children: groupTitle }, void 0, false, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-          lineNumber: 72,
-          columnNumber: 25
+          lineNumber: 74,
+          columnNumber: 29
         }, this),
         !group.isMulty ? /* @__PURE__ */ (0, import_jsx_dev_runtime14.jsxDEV)(SingleGroup, { state, dictionaries, group, doc, setDoc }, void 0, false, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-          lineNumber: 75,
-          columnNumber: 43
+          lineNumber: 77,
+          columnNumber: 47
         }, this) : /* @__PURE__ */ (0, import_jsx_dev_runtime14.jsxDEV)(MultyGroup, { state, dictionaries, group, setGroup, doc, setDoc, setRecordIndex }, void 0, false, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-          lineNumber: 75,
-          columnNumber: 143
+          lineNumber: 77,
+          columnNumber: 147
         }, this)
       ] }, group.id, true, {
         fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-        lineNumber: 71,
-        columnNumber: 14
+        lineNumber: 73,
+        columnNumber: 16
       }, this);
     })
   ] }, location.key, true, {
     fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-    lineNumber: 65,
+    lineNumber: 67,
+    columnNumber: 13
+  }, this) }, void 0, false, {
+    fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
+    lineNumber: 66,
     columnNumber: 10
   }, this);
 }
@@ -1289,7 +1278,7 @@ window.$RefreshReg$ = prevRefreshReg;
 window.$RefreshSig$ = prevRefreshSig;
 
 // app/components/UI/widgets/enter_data/dlg_multy_group.tsx
-var import_react12 = __toESM(require_react2(), 1);
+var import_react11 = __toESM(require_react2(), 1);
 var import_jsx_dev_runtime15 = __toESM(require_jsx_dev_runtime(), 1);
 if (!window.$RefreshReg$ || !window.$RefreshSig$ || !window.$RefreshRuntime$) {
   console.warn("remix:hmr: React Fast Refresh only works when the Remix compiler is running in development mode.");
@@ -1309,14 +1298,14 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/dlg_multy_group.tsx"
   );
-  import.meta.hot.lastModified = "1710504347494.2566";
+  import.meta.hot.lastModified = "1710742981520.8042";
 }
 var {
   Dialog: Dialog2,
   Card: Card2,
   CardBody: CardBody2,
   CardFooter: CardFooter2
-} = import_react12.default;
+} = import_react11.default;
 function DialogMultyGroup({
   state,
   group,
@@ -1335,7 +1324,7 @@ function DialogMultyGroup({
     e.preventDefault();
     setGroup(null);
   };
-  const handleSave = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (group) {
       let formData = new FormData(e.currentTarget);
@@ -1354,11 +1343,10 @@ function DialogMultyGroup({
       }
       setDoc(d);
       setGroup(null);
-      console.log(doc);
     }
   };
   return /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)(Dialog2, { placeholder: "", size: "lg", open: group ? true : false, handler: () => setGroup(null), className: "bg-transparent shadow-none", children: /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)(Card2, { className: "mx-auto w-full", placeholder: "", children: [
-    /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)(CardBody2, { className: "flex flex-col gap-4 overflow-auto", placeholder: "", children: /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)("form", { id: "groupForm", method: "post", onSubmit: handleSave, children: group?.fields ? group.fields.map((fld) => {
+    /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)(CardBody2, { className: "flex flex-col gap-4 overflow-auto", placeholder: "", children: /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)("form", { id: "groupForm", method: "post", onSubmit: handleSubmit, children: group?.fields ? group.fields.map((fld) => {
       let cls = `col-span-${fld.colSpan} col-start-${fld.colStart}`;
       let fieldName = `f${fld.id}`;
       let fieldTitle = fld[`title_${i18n.language}`];
@@ -1373,47 +1361,47 @@ function DialogMultyGroup({
       if (fld.fieldType === "FILE") {
         val = "";
       }
-      return /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)(Field, { cls, state, dictionaries, fieldName, fieldType: fld.fieldType, fieldTitle, fieldLen, fieldRequired, fieldDisabled, fieldDict: fld.dicId, val }, fld.id, false, {
+      return /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)(Field, { cls, state, dictionaries, fieldName, fieldType: fld.fieldType, fieldTitle, fieldLen, fieldRequired, fieldDisabled, fieldDict: fld.dicId, defaultVal: val }, fld.id, false, {
         fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-        lineNumber: 91,
+        lineNumber: 90,
         columnNumber: 20
       }, this);
     }) : /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)(import_jsx_dev_runtime15.Fragment, { children: "-" }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-      lineNumber: 92,
+      lineNumber: 91,
       columnNumber: 16
     }, this) }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-      lineNumber: 75,
+      lineNumber: 74,
       columnNumber: 21
     }, this) }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-      lineNumber: 74,
+      lineNumber: 73,
       columnNumber: 17
     }, this),
     /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)(CardFooter2, { className: "pt-0 flex flex-row gap-3 justify-center", placeholder: "", children: [
       /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)(CustomButton, { className: "bg-primary hover:shadow-primary_shadow", form: "groupForm", type: "submit", children: t("save") }, void 0, false, {
         fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-        lineNumber: 96,
+        lineNumber: 95,
         columnNumber: 21
       }, this),
       /* @__PURE__ */ (0, import_jsx_dev_runtime15.jsxDEV)(CustomButton, { className: "bg-primary hover:shadow-primary_shadow", onClick: handleClose, children: t("close") }, void 0, false, {
         fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-        lineNumber: 99,
+        lineNumber: 98,
         columnNumber: 21
       }, this)
     ] }, void 0, true, {
       fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-      lineNumber: 95,
+      lineNumber: 94,
       columnNumber: 17
     }, this)
   ] }, void 0, true, {
     fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-    lineNumber: 73,
+    lineNumber: 72,
     columnNumber: 13
   }, this) }, void 0, false, {
     fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-    lineNumber: 72,
+    lineNumber: 71,
     columnNumber: 10
   }, this);
 }
@@ -1446,7 +1434,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/widgets/enter_data/view.tsx"
   );
-  import.meta.hot.lastModified = "1710415336660.924";
+  import.meta.hot.lastModified = "1710742937816.3804";
 }
 function EnterDataView({
   errors,
@@ -1464,8 +1452,8 @@ function EnterDataView({
   setDoc
 }) {
   _s15();
-  const [group, setGroup] = (0, import_react13.useState)(null);
-  const [recordIndex, setRecordIndex] = (0, import_react13.useState)(0);
+  const [group, setGroup] = (0, import_react12.useState)(null);
+  const [recordIndex, setRecordIndex] = (0, import_react12.useState)(0);
   return /* @__PURE__ */ (0, import_jsx_dev_runtime16.jsxDEV)("div", { className: "h-[calc(100vh-5rem)] flex flex-col gap-3 pb-5", children: [
     /* @__PURE__ */ (0, import_jsx_dev_runtime16.jsxDEV)(ErrorMessage, { errors }, void 0, false, {
       fileName: "app/components/UI/widgets/enter_data/view.tsx",
@@ -1542,7 +1530,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/routes/dashboard.enter_data.$formId.tsx"
   );
-  import.meta.hot.lastModified = "1710497383422.445";
+  import.meta.hot.lastModified = "1710748201916.8281";
 }
 function EnterData() {
   _s16();
@@ -1558,16 +1546,17 @@ function EnterData() {
     doc,
     state
   } = useLoaderData();
-  const [document2, setDocument] = (0, import_react15.useState)(doc);
+  const [document, setDocument] = (0, import_react14.useState)(doc);
   const navigation = useNavigation();
-  const formRef = (0, import_react15.useRef)(null);
+  const formRef = (0, import_react14.useRef)(null);
   const userId = 1;
   const data = useActionData();
-  const [showFind, setShowFind] = (0, import_react15.useState)(false);
-  (0, import_react15.useEffect)(() => {
+  const [showFind, setShowFind] = (0, import_react14.useState)(false);
+  (0, import_react14.useEffect)(() => {
+    formRef.current?.reset();
     setDocument(doc);
   }, [doc]);
-  (0, import_react15.useEffect)(() => {
+  (0, import_react14.useEffect)(() => {
     if (data?.docs && data?.ok) {
       setDocs(data.docs);
       setShowFind(true);
@@ -1582,9 +1571,9 @@ function EnterData() {
       }));
     }
   }, [data]);
-  return /* @__PURE__ */ (0, import_jsx_dev_runtime17.jsxDEV)(EnterDataView, { errors: data?.errors, open: showFind, setOpen: setShowFind, docs, userId, current, setCurrent, formRef, inputForm, state, dictionaries, doc: document2, setDoc: setDocument }, void 0, false, {
+  return /* @__PURE__ */ (0, import_jsx_dev_runtime17.jsxDEV)(EnterDataView, { errors: data?.errors, open: showFind, setOpen: setShowFind, docs, userId, current, setCurrent, formRef, inputForm, state, dictionaries, doc: document, setDoc: setDocument }, void 0, false, {
     fileName: "app/routes/dashboard.enter_data.$formId.tsx",
-    lineNumber: 191,
+    lineNumber: 173,
     columnNumber: 10
   }, this);
 }
@@ -1599,4 +1588,4 @@ window.$RefreshSig$ = prevRefreshSig;
 export {
   EnterData as default
 };
-//# sourceMappingURL=/build/routes/dashboard.enter_data.$formId-JLDEXYBO.js.map
+//# sourceMappingURL=/build/routes/dashboard.enter_data.$formId-BZX6L6RY.js.map

@@ -12,7 +12,7 @@ export default function ButtonDelete({ userId, inputFormId, doc }: ButtonDeleteP
     const { t } = useTranslation()
     const handleDelete = async (event: any) => {
         const response = confirm(
-            "Please confirm you want to delete this record."
+            t('confirm_delete')
         )
         if (!response) {
             event.preventDefault()

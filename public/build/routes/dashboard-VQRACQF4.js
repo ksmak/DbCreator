@@ -155,7 +155,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/elements/logo.tsx"
   );
-  import.meta.hot.lastModified = "1710245389718.551";
+  import.meta.hot.lastModified = "1710586467399.0007";
 }
 var Logo = () => {
   return /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(Link, { to: "/dashboard", className: "flex gap-3", children: [
@@ -773,4 +773,4 @@ function dashboard() {
 export {
   dashboard as default
 };
-//# sourceMappingURL=/build/routes/dashboard-ATCVKR7K.js.map
+//# sourceMappingURL=/build/routes/dashboard-VQRACQF4.js.map

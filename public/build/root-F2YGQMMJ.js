@@ -46,7 +46,7 @@ function useChangeLanguage(locale) {
 var import_i18next = __toESM(require_i18next(), 1);
 
 // app/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-NZXBN34F.css";
+var tailwind_default = "/build/_assets/tailwind-ADO3XY3P.css";
 
 // app/root.tsx
 var import_jsx_dev_runtime = __toESM(require_jsx_dev_runtime(), 1);
@@ -161,4 +161,4 @@ export {
   handle,
   links
 };
-//# sourceMappingURL=/build/root-6HOPXKBO.js.map
+//# sourceMappingURL=/build/root-F2YGQMMJ.js.map

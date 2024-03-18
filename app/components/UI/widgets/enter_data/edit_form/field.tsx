@@ -2,6 +2,7 @@ import { IDict } from "~/types/types"
 import CustomInput from "~/components/UI/elements/custom_input"
 import CustomSelect from "~/components/UI/elements/custom_select"
 import { useTranslation } from "react-i18next"
+import moment from "moment"
 
 type FieldProps = {
     state: string | null,
@@ -14,7 +15,7 @@ type FieldProps = {
     fieldRequired: boolean,
     fieldDisabled: boolean,
     fieldDict: number | null,
-    val: string,
+    defaultVal: string,
 }
 
 export default function Field({
@@ -28,7 +29,7 @@ export default function Field({
     fieldRequired,
     fieldDisabled,
     fieldDict,
-    val,
+    defaultVal,
 }: FieldProps) {
     const { i18n } = useTranslation()
 
@@ -41,7 +42,7 @@ export default function Field({
                     title={fieldTitle}
                     type="text"
                     name={fieldName}
-                    defaultValue={val}
+                    defaultValue={defaultVal}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -56,7 +57,7 @@ export default function Field({
                     title={fieldTitle}
                     type="text"
                     name={fieldName}
-                    defaultValue={val}
+                    defaultValue={defaultVal}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -71,7 +72,7 @@ export default function Field({
                     title={fieldTitle}
                     type="number"
                     name={fieldName}
-                    defaultValue={val}
+                    defaultValue={defaultVal}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -87,7 +88,7 @@ export default function Field({
                     type="number"
                     step="0.01"
                     name={fieldName}
-                    defaultValue={val}
+                    defaultValue={defaultVal}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -102,7 +103,7 @@ export default function Field({
                     id={fieldName}
                     title={fieldTitle}
                     name={fieldName}
-                    defaultValue={val}
+                    defaultValue={defaultVal}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                 >
@@ -124,7 +125,7 @@ export default function Field({
                     title={fieldTitle}
                     type="date"
                     name={fieldName}
-                    defaultValue={val}
+                    defaultValue={moment(defaultVal, 'DD.MM.YYYY').format("YYYY-MM-DD")}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -139,7 +140,7 @@ export default function Field({
                     title={fieldTitle}
                     type="time"
                     name={fieldName}
-                    defaultValue={val}
+                    defaultValue={defaultVal}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -154,7 +155,7 @@ export default function Field({
                     title={fieldTitle}
                     type="file"
                     name={fieldName}
-                    defaultValue={val}
+                    defaultValue=""
                     required={fieldRequired}
                     disabled={fieldDisabled}
                 />

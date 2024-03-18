@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import ErrorMessage from "../../elements/error_message";
 import Buttons from "./buttons/buttons";
 import DialogFindResult from "./dlg_find_result";
-import RecNavigator from "./rec_navigator";
+import RecNavigator from "./edit_form/rec_navigator";
 import Panel from "../../elements/panel";
 import EditForm from "./edit_form/edit_form";
 import DialogMultyGroup from "./dlg_multy_group";

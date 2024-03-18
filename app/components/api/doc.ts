@@ -10,7 +10,11 @@ export default function DocModule(prisma: PrismaClient) {
                 for (const field of group.fields) {
                     fields[`f${field.id}`] = ''
                 }
-                tables[`tbl_${group.id}`] = []
+                if (group.isMulty) {
+                    tables[`tbl_${group.id}`] = []
+                } else {
+                    tables[`tbl_${group.id}`] = [fields]
+                }
             }
             let doc = {
                 id: null,
@@ -54,7 +58,7 @@ export default function DocModule(prisma: PrismaClient) {
                                 sql = sql + `, to_char(${fieldName}, 'DD.MM.YYYY') ${fieldName}`
                                 break
                             case "TIME":
-                                sql = sql + `, to_char(f${fieldName}, 'HH:MI') ${fieldName}`
+                                sql = sql + `, to_char(${fieldName}, 'HH:MI') ${fieldName}`
                                 break
                             default:
                                 sql = sql + `, ${fieldName}`
@@ -67,10 +71,10 @@ export default function DocModule(prisma: PrismaClient) {
             }
             return doc
         },
-        async createDoc(userId: number | null, inputForm: any, doc: any) {
+        async createDoc(userId: number | null, inputForm: any, formData: FormData) {
+            let tr = []
             const seq = await prisma.$queryRaw`SELECT nextval('doc_id_seq')`
             const sid = Number(seq[0].nextval)
-            let tr = []
             tr.push(
                 prisma.doc.create({
                     data: {
@@ -87,38 +91,43 @@ export default function DocModule(prisma: PrismaClient) {
                 })
             )
             for (const group of inputForm.groups) {
-                const tbl = `tbl_${group.id}`
-                for (const rec of doc[tbl]) {
+                const tableName = `tbl_${group.id}`
+                let recCount = Number(formData.get(`${tableName}__count`))
+                for (let i = 0; i < recCount; i++) {
                     let flds = "sid"
                     let vals = `${sid}`
                     for (const field of group.fields) {
                         const fieldName = `f${field.id}`
                         flds = flds + `, ${fieldName}`
-                        const fieldVal: string = rec[fieldName]
                         switch (field.fieldType) {
                             case "TEXT":
                             case "CYRILLIC":
                             case "DATE":
                             case "TIME":
+                                let stringVal = formData.get(`${tableName}__${fieldName}__${i}`)?.toString()
+                                vals = vals + `, ${!stringVal ? 'null' : `'${stringVal}'`}`
+                                break
                             case "FILE":
-                                vals = vals + `, ${['', '-'].includes(fieldVal) ? 'null' : `'${fieldVal}'`}`
+                                let fileVal = formData.get(`${tableName}__${fieldName}__${i}`) as File
+                                vals = vals + `, ${!fileVal ? 'null' : `'/uploads/${fileVal.name}'`}`
                                 break
                             default:
-                                vals = vals + `, ${['', '-'].includes(fieldVal) ? 'null' : fieldVal}`
+                                let numberVal = formData.get(`${tableName}__${fieldName}__${i}`)?.toString()
+                                vals = vals + `, ${!numberVal ? ' null' : `${numberVal}`}`
                                 break
                         }
                     }
-                    tr.push(prisma.$executeRawUnsafe(`INSERT INTO ${tbl}(${flds}) VALUES(${vals})`))
+                    tr.push(prisma.$executeRawUnsafe(`INSERT INTO ${tableName}(${flds}) VALUES(${vals})`))
                 }
             }
             return prisma.$transaction(tr)
         },
-        updateDoc(userId: number | null, inputForm: any, doc: any) {
+        updateDoc(userId: number | null, inputForm: any, formData: FormData, docId: number) {
             let tr = []
             tr.push(
                 prisma.doc.update({
                     where: {
-                        id: doc.id
+                        id: docId
                     },
                     data: {
                         formId: inputForm.id,
@@ -133,63 +142,69 @@ export default function DocModule(prisma: PrismaClient) {
                 })
             )
             for (const group of inputForm.groups) {
-                const tbl = `tbl_${group.id}`
-                // deleting all rows
-                tr.push(prisma.$executeRawUnsafe(`DELETE FROM ${tbl} WHERE sid=${doc.id}`))
-                // inserting rows
-                for (const rec of doc[tbl]) {
+                const tableName = `tbl_${group.id}`
+                tr.push(prisma.$executeRawUnsafe(`DELETE FROM ${tableName} WHERE sid=${docId}`))
+                let recCount = Number(formData.get(`${tableName}__count`))
+                for (let i = 0; i < recCount; i++) {
                     let flds = "sid"
-                    let vals = `${doc.id}`
+                    let vals = `${docId}`
                     for (const field of group.fields) {
                         const fieldName = `f${field.id}`
                         flds = flds + `, ${fieldName}`
-                        const fieldVal: string = rec[fieldName]
                         switch (field.fieldType) {
                             case "TEXT":
                             case "CYRILLIC":
                             case "DATE":
                             case "TIME":
+                                let stringVal = formData.get(`${tableName}__${fieldName}__${i}`)?.toString()
+                                vals = vals + `, ${!stringVal ? 'null' : `'${stringVal}'`}`
+                                break
                             case "FILE":
-                                vals = vals + `, ${['', '-'].includes(fieldVal) ? 'null' : `'${fieldVal}'`}`
+                                let fileVal = formData.get(`${tableName}__${fieldName}__${i}`) as File
+                                vals = vals + `, ${!fileVal ? 'null' : `'/uploads/${fileVal.name}'`}`
                                 break
                             default:
-                                vals = vals + `, ${['', '-'].includes(fieldVal) ? 'null' : fieldVal}`
+                                let numberVal = formData.get(`${tableName}__${fieldName}__${i}`)?.toString()
+                                vals = vals + `, ${!numberVal ? ' null' : `${numberVal}`}`
                                 break
                         }
                     }
-                    tr.push(prisma.$executeRawUnsafe(`INSERT INTO ${tbl}(${flds}) VALUES(${vals})`))
+                    tr.push(prisma.$executeRawUnsafe(`INSERT INTO ${tableName}(${flds}) VALUES(${vals})`))
                 }
             }
             return prisma.$transaction(tr)
         },
-        findDoc(inputForm: any, doc: any) {
+        findDoc(inputForm: any, formData: FormData) {
             let sf = ''
             let select = 'SELECT distinct doc.id'
             let from = ' FROM "Doc" doc'
             let where = ' WHERE doc."isActive" is true'
             let tbls: string[] = []
             for (const group of inputForm.groups) {
-                const tbl = `tbl_${group.id}`
-                if (!group.isMulty) {
+                const tableName = `tbl_${group.id}`
+                let recCount = Number(formData.get(`${tableName}__count`))
+                for (let i = 0; i <= recCount; i++) {
                     for (const field of group.fields) {
                         const fieldName = `f${field.id}`
-                        const fieldVal = doc[tbl][0][fieldName]
-                        if (!['', '-'].includes(fieldVal)) {
-                            if (!tbls.includes(tbl)) {
-                                tbls.push(tbl)
-                                where = where + ` AND doc.id = ${tbl}.sid`
-                                from = from + `, ${tbl}`
+                        let fieldVal = formData.get(`${tableName}__${fieldName}__${i}`)
+                        if (fieldVal) {
+                            if (!tbls.includes(tableName)) {
+                                tbls.push(tableName)
+                                where = where + ` AND doc.id = ${tableName}.sid`
+                                from = from + `, ${tableName}`
                             }
                             switch (field.fieldType) {
                                 case "TEXT":
                                 case "CYRILLIC":
                                 case "DATE":
                                 case "TIME":
+                                    where = where + ' AND ' + `${fieldName} = '${fieldVal}'`
+                                    break
                                 case "FILE":
-                                    where = where + ` AND ${fieldName} = '${fieldVal}'`
+                                    where = where + ' AND ' + `${fieldName} = '/uploads/${(fieldVal as File).name}'`
                                     break
                                 default:
-                                    where = where + ` AND ${fieldName} = ${fieldVal}`
+                                    where = where + ' AND ' + `${fieldName} = ${fieldVal}`
                                     break
                             }
                         }

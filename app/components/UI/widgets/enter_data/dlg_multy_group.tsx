@@ -32,7 +32,7 @@ export default function DialogMultyGroup({
         e.preventDefault()
         setGroup(null)
     }
-    const handleSave = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (group) {
             let formData = new FormData(e.currentTarget)
@@ -45,7 +45,6 @@ export default function DialogMultyGroup({
             }
             setDoc(d)
             setGroup(null)
-            console.log(doc)
         }
     }
 
@@ -62,7 +61,7 @@ export default function DialogMultyGroup({
                     <form
                         id="groupForm"
                         method="post"
-                        onSubmit={handleSave}
+                        onSubmit={handleSubmit}
                     >
                         {group?.fields ? group.fields.map((fld: InputField) => {
                             let cls = `col-span-${fld.colSpan} col-start-${fld.colStart}`
@@ -93,7 +92,7 @@ export default function DialogMultyGroup({
                                     fieldRequired={fieldRequired}
                                     fieldDisabled={fieldDisabled}
                                     fieldDict={fld.dicId}
-                                    val={val}
+                                    defaultVal={val}
                                 />
                             )
                         }) : <>-</>}

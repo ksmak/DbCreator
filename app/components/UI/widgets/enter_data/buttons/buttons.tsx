@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 import ButtonCancel from "./btn_cancel";
 import ButtonCreate from "./btn_create";
 import ButtonDelete from "./btn_delete";
@@ -10,7 +11,7 @@ type ButtonsProps = {
     userId: number,
     inputFormId: number,
     state: string | null,
-    doc: any
+    doc: any,
 }
 
 export default function Buttons({ userId, inputFormId, state, doc }: ButtonsProps) {
@@ -25,13 +26,13 @@ export default function Buttons({ userId, inputFormId, state, doc }: ButtonsProp
                 ? <ButtonSearch inputFormId={inputFormId} />
                 : null}
             {state === "search"
-                ? <ButtonFind userId={userId} inputFormId={inputFormId} doc={doc} />
+                ? <ButtonFind />
                 : null}
             {doc.id && !['create', 'edit'].includes(String(state))
                 ? <ButtonEdit inputFormId={inputFormId} docId={doc.id} />
                 : null}
             {state === 'edit' || state === 'create'
-                ? <ButtonSave userId={userId} inputFormId={inputFormId} doc={doc} />
+                ? <ButtonSave />
                 : null}
             {state === 'edit' || state === 'search' || state === 'create'
                 ? <ButtonCancel inputFormId={inputFormId} docId={doc.id} />

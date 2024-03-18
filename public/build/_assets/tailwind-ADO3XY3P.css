@@ -792,6 +792,9 @@ video {
 .w-screen {
   width: 100vw;
 }
+.w-96 {
+  width: 24rem;
+}
 .min-w-40 {
   min-width: 10rem;
 }
@@ -824,6 +827,9 @@ video {
 }
 .min-w-\[95\%\] {
   min-width: 95%;
+}
+.min-w-96 {
+  min-width: 24rem;
 }
 .max-w-\[100vw\] {
   max-width: 100vw;
@@ -1577,6 +1583,10 @@ video {
 }
 .bg-yellow-500\/20 {
   background-color: #ffeb3b33;
+}
+.bg-secondary {
+  --tw-bg-opacity: 1;
+  background-color: rgb(169 169 169 / var(--tw-bg-opacity));
 }
 .bg-opacity-60 {
   --tw-bg-opacity: .6;
@@ -4892,4 +4902,4 @@ video {
 .\[\&\:\:-webkit-slider-thumb\]\:\[-webkit-appearance\:none\]::-webkit-slider-thumb {
   -webkit-appearance: none;
 }
-/*# sourceMappingURL=/build/_assets/tailwind-M3YW2CPH.css.map */
+/*# sourceMappingURL=/build/_assets/tailwind-UBHIGXPP.css.map */

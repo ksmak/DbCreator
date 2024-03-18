@@ -41,7 +41,7 @@ export default function SingleGroup({ state, dictionaries, group, doc, setDoc }:
                         fieldRequired={fieldRequired}
                         fieldDisabled={fieldDisabled}
                         fieldDict={fld.dicId}
-                        val={val}
+                        defaultVal={val}
                     />
                 )
             })}

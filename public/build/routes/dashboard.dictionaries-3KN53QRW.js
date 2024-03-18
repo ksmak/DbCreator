@@ -3,7 +3,7 @@ import {
   ErrorMessage,
   Panel,
   require_node
-} from "/build/_shared/chunk-QI3KDWHL.js";
+} from "/build/_shared/chunk-RAAIBPHZ.js";
 import "/build/_shared/chunk-Z46RVADL.js";
 import {
   useTranslation
@@ -595,4 +595,4 @@ window.$RefreshSig$ = prevRefreshSig;
 export {
   Dictionaries as default
 };
-//# sourceMappingURL=/build/routes/dashboard.dictionaries-PQFMGWYS.js.map
+//# sourceMappingURL=/build/routes/dashboard.dictionaries-3KN53QRW.js.map

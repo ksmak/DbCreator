@@ -1,4 +1,4 @@
-import { Form, useNavigate } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import CustomButton from "~/components/UI/elements/custom_button";
 import { useTranslation } from "react-i18next";
 

@@ -1589,7 +1589,7 @@ if (import.meta) {
     //@ts-expect-error
     "app/components/UI/elements/custom_button.tsx"
   );
-  import.meta.hot.lastModified = "1710304184373.631";
+  import.meta.hot.lastModified = "1710750876044.718";
 }
 function CustomButton({
   className,
@@ -1599,9 +1599,9 @@ function CustomButton({
 }) {
   let cls = "";
   if (outline) {
-    cls = `border text-xs py-1.5 px-3.5 flex items-center gap-2 rounded-md hover:cursor-pointer hover:shadow-lg font-semibold uppercase ${className}`;
+    cls = `border text-xs py-1.5 px-3.5 flex justify-center items-center gap-2 rounded-md hover:cursor-pointer hover:shadow-lg font-semibold uppercase ${className}`;
   } else {
-    cls = `text-white text-xs py-1.5 px-3.5 flex items-center gap-2 rounded-md hover:cursor-pointer hover:shadow-lg font-semibold uppercase ${className}`;
+    cls = `text-white text-xs py-1.5 px-3.5 flex justify-center items-center gap-2 rounded-md hover:cursor-pointer hover:shadow-lg font-semibold uppercase ${className}`;
   }
   return /* @__PURE__ */ (0, import_jsx_dev_runtime3.jsxDEV)("button", { ...props, className: cls, children }, void 0, false, {
     fileName: "app/components/UI/elements/custom_button.tsx",
@@ -1637,4 +1637,4 @@ export {
      *)
   *)
 */
-//# sourceMappingURL=/build/_shared/chunk-QI3KDWHL.js.map
+//# sourceMappingURL=/build/_shared/chunk-RAAIBPHZ.js.map

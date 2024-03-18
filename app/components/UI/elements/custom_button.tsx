@@ -10,9 +10,9 @@ interface CustomButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export default function CustomButton({ className, outline, children, ...props }: CustomButtonProps) {
     let cls = ""
     if (outline) {
-        cls = `border text-xs py-1.5 px-3.5 flex items-center gap-2 rounded-md hover:cursor-pointer hover:shadow-lg font-semibold uppercase ${className}`
+        cls = `border text-xs py-1.5 px-3.5 flex justify-center items-center gap-2 rounded-md hover:cursor-pointer hover:shadow-lg font-semibold uppercase ${className}`
     } else {
-        cls = `text-white text-xs py-1.5 px-3.5 flex items-center gap-2 rounded-md hover:cursor-pointer hover:shadow-lg font-semibold uppercase ${className}`
+        cls = `text-white text-xs py-1.5 px-3.5 flex justify-center items-center gap-2 rounded-md hover:cursor-pointer hover:shadow-lg font-semibold uppercase ${className}`
     }
     return (
         <button {...props}

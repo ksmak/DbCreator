@@ -22,25 +22,24 @@ export default function DialogFindResult({ open, setOpen, docs }: DialogFindResu
             navigate(`/dashboard/enter_data/${docs.formId}?state=search`)
         }
     }
-
     return (
         <Dialog
             placeholder=""
-            size="sm"
+            size="xs"
             open={open}
-            handler={() => handleOpenInputForm()}
+            // handler={() => handleOpenInputForm()}
             className="bg-transparent shadow-none"
         >
             <Card className="mx-auto w-full" placeholder="">
                 <CardBody className="flex flex-col gap-4 overflow-auto" placeholder="">
                     {docs && docs.ids?.length
-                        ? <div className="text-bold p-1">{t('find_result')}: {docs.ids?.length}</div>
+                        ? <div className="font-bold text-lg p-1 text-primary text-center">{t('find_result')} {docs.ids?.length}</div>
                         : <div className="text-bold p-1">{t('nothing')}</div>}
 
                 </CardBody>
                 <CardFooter className="pt-0 flex flex-row gap-3 justify-center" placeholder="">
                     <CustomButton
-                        className="bg-green-500 hover:shadow-green-100"
+                        className="bg-primary hover:shadow-primary_shadow w-40"
                         onClick={() => handleOpenInputForm()}
                     >
                         OK

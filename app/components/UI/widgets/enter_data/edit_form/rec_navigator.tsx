@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@remix-run/react";
 import { ChangeEvent, Dispatch, KeyboardEvent, SetStateAction, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type RecNavigatorProps = {
     docs: any,
@@ -8,6 +9,7 @@ type RecNavigatorProps = {
 }
 
 export default function RecNavigator({ docs, current, setCurrent }: RecNavigatorProps) {
+    const { t } = useTranslation()
     const [val, setVal] = useState(current)
     const navigate = useNavigate()
     const handleFirst = () => {
@@ -57,7 +59,7 @@ export default function RecNavigator({ docs, current, setCurrent }: RecNavigator
                         {current + 1} / {docs.ids.length}
                     </p>
                     <input
-                        className="p-1 text-blue-gray-600 focus:outline-0 w-20"
+                        className="ml-1 p-1 text-primary focus:outline-0 w-20 border border-primary rounded"
                         type="number"
                         max={docs.ids.length}
                         min={1}
@@ -66,31 +68,31 @@ export default function RecNavigator({ docs, current, setCurrent }: RecNavigator
 
                     />
                     <button
-                        className="w-20 text-center border bg-blue-gray-500 p-1 font-bold text-white rounded"
+                        className="w-20 text-center border bg-secondary p-1 font-bold text-white rounded"
                         onClick={() => handleSeek(val)}
                     >
-                        Seek
+                        {t('seek')}
                     </button>
                     <button
-                        className="w-8 text-center border bg-orange-700 p-1 font-bold text-white rounded"
+                        className="w-8 text-center border bg-secondary p-1 font-bold text-white rounded"
                         onClick={() => handleFirst()}
                     >
                         &lt;&lt;
                     </button>
                     <button
-                        className="w-8 text-center border bg-orange-700 p-1 font-bold text-white rounded"
+                        className="w-8 text-center border bg-secondary p-1 font-bold text-white rounded"
                         onClick={() => handlePrev()}
                     >
                         &lt;
                     </button>
                     <button
-                        className="w-8 text-center border bg-orange-700 p-1 font-bold text-white rounded"
+                        className="w-8 text-center border bg-secondary p-1 font-bold text-white rounded"
                         onClick={() => handleNext()}
                     >
                         &gt;
                     </button>
                     <button
-                        className="w-8 text-center border bg-orange-700 p-1 font-bold text-white rounded"
+                        className="w-8 text-center border bg-secondary p-1 font-bold text-white rounded"
                         onClick={() => handleLast()}
                     >
                         &gt;&gt;
