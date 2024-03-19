@@ -22,7 +22,7 @@ export default function CustomSelect({ className, id, title, errors, children, .
             <div className="flex flex-col justify-between">
                 <select
                     id={id}
-                    className="font-mono text-sm border-2 p-1 focus:outline-blue-gray-500 bg-white"
+                    className="font-mono font-bold text-sm border-2 p-1 focus:outline-blue-gray-500 bg-white"
                     {...props}
                 >
                     {children}

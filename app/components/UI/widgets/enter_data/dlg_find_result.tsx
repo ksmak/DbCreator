@@ -34,7 +34,7 @@ export default function DialogFindResult({ open, setOpen, docs }: DialogFindResu
                 <CardBody className="flex flex-col gap-4 overflow-auto" placeholder="">
                     {docs && docs.ids?.length
                         ? <div className="font-bold text-lg p-1 text-primary text-center">{t('find_result')} {docs.ids?.length}</div>
-                        : <div className="text-bold p-1">{t('nothing')}</div>}
+                        : <div className="font-bold text-lg p-1 text-primary text-center">{t('nothing')}</div>}
 
                 </CardBody>
                 <CardFooter className="pt-0 flex flex-row gap-3 justify-center" placeholder="">

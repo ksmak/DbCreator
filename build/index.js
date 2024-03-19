@@ -125,7 +125,7 @@ import { useChangeLanguage } from "remix-i18next/react";
 import { useTranslation } from "react-i18next";
 
 // app/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-ADO3XY3P.css";
+var tailwind_default = "/build/_assets/tailwind-AV7DHKZF.css";
 
 // app/root.tsx
 import { jsxDEV as jsxDEV2 } from "react/jsx-dev-runtime";
@@ -881,7 +881,7 @@ function DocModule(prisma2) {
                 break;
               case "FILE":
                 let fileVal = formData.get(`${tableName}__${fieldName}__${i}`);
-                vals = vals + `, ${fileVal ? `'/uploads/${fileVal.name}'` : "null"}`;
+                vals = vals + `, ${fileVal.size === 0 ? "null" : `'/uploads/${fileVal.name}'`}`;
                 break;
               default:
                 let numberVal = formData.get(`${tableName}__${fieldName}__${i}`)?.toString();
@@ -915,31 +915,60 @@ function DocModule(prisma2) {
       );
       for (let group of inputForm.groups) {
         let tableName = `tbl_${group.id}`;
-        tr.push(prisma2.$executeRawUnsafe(`DELETE FROM ${tableName} WHERE sid=${docId}`));
-        let recCount = Number(formData.get(`${tableName}__count`));
-        for (let i = 0; i < recCount; i++) {
-          let flds = "sid", vals = `${docId}`;
-          for (let field of group.fields) {
-            let fieldName = `f${field.id}`;
-            switch (flds = flds + `, ${fieldName}`, field.fieldType) {
-              case "TEXT":
-              case "CYRILLIC":
-              case "DATE":
-              case "TIME":
-                let stringVal = formData.get(`${tableName}__${fieldName}__${i}`)?.toString();
-                vals = vals + `, ${stringVal ? `'${stringVal}'` : "null"}`;
-                break;
-              case "FILE":
-                let fileVal = formData.get(`${tableName}__${fieldName}__${i}`);
-                vals = vals + `, ${fileVal ? `'/uploads/${fileVal.name}'` : "null"}`;
-                break;
-              default:
-                let numberVal = formData.get(`${tableName}__${fieldName}__${i}`)?.toString();
-                vals = vals + `, ${numberVal ? `${numberVal}` : " null"}`;
-                break;
+        if (group.isMulty) {
+          tr.push(prisma2.$executeRawUnsafe(`DELETE FROM ${tableName} WHERE sid=${docId}`));
+          let recCount = Number(formData.get(`${tableName}__count`));
+          for (let i = 0; i < recCount; i++) {
+            let flds = "sid", vals = `${docId}`;
+            for (let field of group.fields) {
+              let fieldName = `f${field.id}`;
+              flds = flds + `, ${fieldName}`;
+              let fieldVal = formData.get(`${tableName}__${fieldName}__${i}`);
+              if (["null", ""].includes(String(fieldVal)))
+                vals = vals + ", null";
+              else
+                switch (field.fieldType) {
+                  case "TEXT":
+                  case "CYRILLIC":
+                  case "DATE":
+                  case "TIME":
+                    vals = vals + `, '${fieldVal}'`;
+                    break;
+                  case "FILE":
+                    vals = vals + `, '/uploads/${fieldVal.name}'`;
+                    break;
+                  default:
+                    vals = vals + `, ${fieldVal}`;
+                    break;
+                }
             }
+            tr.push(prisma2.$executeRawUnsafe(`INSERT INTO ${tableName}(${flds}) VALUES(${vals})`));
           }
-          tr.push(prisma2.$executeRawUnsafe(`INSERT INTO ${tableName}(${flds}) VALUES(${vals})`));
+        } else {
+          tr.push(prisma2.$executeRawUnsafe(`DELETE FROM ${tableName} WHERE sid=${docId}`));
+          let sets = " SET ", id = formData.get(`${tableName}__id`);
+          for (let field of group.fields) {
+            let fieldName = `f${field.id}`, fieldVal = formData.get(`${tableName}__${fieldName}__0`);
+            if (["null", ""].includes(String(fieldVal)))
+              sets = sets + `, ${fieldName} = null`;
+            else
+              switch (field.fieldType) {
+                case "TEXT":
+                case "CYRILLIC":
+                case "DATE":
+                case "TIME":
+                  sets = sets + `, ${fieldName} = '${fieldVal}'`;
+                  break;
+                case "FILE":
+                  let file = fieldVal;
+                  file.name && (sets = sets + `, ${fieldName} = '/uploads/${file.name}'`);
+                  break;
+                default:
+                  sets = sets + `, ${fieldName} = ${fieldVal}`;
+                  break;
+              }
+          }
+          tr.push(prisma2.$executeRawUnsafe(`UPDATE ${tableName} SET ${sets}) WHERE id={id}`));
         }
       }
       return prisma2.$transaction(tr);
@@ -2076,7 +2105,7 @@ function ButtonCancel({ inputFormId, docId }) {
     CustomButton,
     {
       outline: !0,
-      className: "hover:shadow-primary_shadow text-primary border-primary",
+      className: "w-32 hover:shadow-primary_shadow text-primary border-primary",
       onClick: () => navigate(`/dashboard/enter_data/${inputFormId}?docId=${docId}`),
       children: [
         /* @__PURE__ */ jsxDEV15("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV15("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M6 18 18 6M6 6l12 12" }, void 0, !1, {
@@ -2111,7 +2140,7 @@ function ButtonCreate({ inputFormId }) {
   return /* @__PURE__ */ jsxDEV16(
     CustomButton,
     {
-      className: "bg-primary hover:shadow-primary_shadow",
+      className: "w-32 bg-primary hover:shadow-primary_shadow",
       onClick: () => navigate(`/dashboard/enter_data/${inputFormId}?state=create`),
       children: [
         /* @__PURE__ */ jsxDEV16("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV16("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M12 4.5v15m7.5-7.5h-15" }, void 0, !1, {
@@ -2166,7 +2195,7 @@ function ButtonDelete({ userId, inputFormId, doc }) {
     /* @__PURE__ */ jsxDEV17(
       CustomButton,
       {
-        className: "bg-red-500 hover:shadow-red-100",
+        className: "w-32 bg-red-500 hover:shadow-red-100",
         onClick: handleDelete,
         type: "submit",
         name: "_action",
@@ -2209,7 +2238,7 @@ function ButtonEdit({ inputFormId, docId }) {
   return /* @__PURE__ */ jsxDEV18(
     CustomButton,
     {
-      className: "bg-blue-gray-500 hover:shadow-blue-gray-100",
+      className: "w-32 bg-blue-gray-500 hover:shadow-blue-gray-100",
       onClick: () => navigate(`/dashboard/enter_data/${inputFormId}?state=edit&docId=${docId}`),
       children: [
         /* @__PURE__ */ jsxDEV18("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV18("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" }, void 0, !1, {
@@ -2243,7 +2272,7 @@ function ButtonFind() {
   return /* @__PURE__ */ jsxDEV19(
     CustomButton,
     {
-      className: "bg-blue-gray-500 hover:shadow-blue-gray-100",
+      className: "w-32 bg-blue-gray-500 hover:shadow-blue-gray-100",
       form: "documentForm",
       type: "submit",
       name: "_action",
@@ -2280,7 +2309,7 @@ function ButtonSave() {
   return /* @__PURE__ */ jsxDEV20(
     CustomButton,
     {
-      className: "bg-primary hover:shadow-primary_shadow",
+      className: "w-32 bg-primary hover:shadow-primary_shadow",
       form: "documentForm",
       type: "submit",
       name: "_action",
@@ -2318,7 +2347,7 @@ function ButtonSearch2({ inputFormId }) {
   return /* @__PURE__ */ jsxDEV21(
     CustomButton,
     {
-      className: "bg-primary hover:shadow-primary_shadow",
+      className: "w-32 bg-primary hover:shadow-primary_shadow",
       onClick: () => navigate(`/dashboard/enter_data/${inputFormId}?state=search`),
       children: [
         /* @__PURE__ */ jsxDEV21("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV21("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" }, void 0, !1, {
@@ -2426,7 +2455,7 @@ function DialogFindResult({ open, setOpen, docs }) {
           fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
           lineNumber: 36,
           columnNumber: 27
-        }, this) : /* @__PURE__ */ jsxDEV23("div", { className: "text-bold p-1", children: t("nothing") }, void 0, !1, {
+        }, this) : /* @__PURE__ */ jsxDEV23("div", { className: "font-bold text-lg p-1 text-primary text-center", children: t("nothing") }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/dlg_find_result.tsx",
           lineNumber: 37,
           columnNumber: 27
@@ -2643,7 +2672,7 @@ function CustomSelect({ className, id, title, errors, children, ...props }) {
             "select",
             {
               id,
-              className: "font-mono text-sm border-2 p-1 focus:outline-blue-gray-500 bg-white",
+              className: "font-mono font-bold text-sm border-2 p-1 focus:outline-blue-gray-500 bg-white",
               ...props,
               children
             },
@@ -2682,7 +2711,7 @@ function CustomSelect({ className, id, title, errors, children, ...props }) {
 // app/components/UI/widgets/enter_data/edit_form/field.tsx
 import { useTranslation as useTranslation12 } from "react-i18next";
 import moment from "moment";
-import { jsxDEV as jsxDEV26 } from "react/jsx-dev-runtime";
+import { Fragment, jsxDEV as jsxDEV26 } from "react/jsx-dev-runtime";
 function Field({
   state,
   dictionaries,
@@ -2717,7 +2746,7 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 39,
+          lineNumber: 41,
           columnNumber: 17
         },
         this
@@ -2741,7 +2770,7 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 54,
+          lineNumber: 56,
           columnNumber: 17
         },
         this
@@ -2765,7 +2794,7 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 69,
+          lineNumber: 71,
           columnNumber: 17
         },
         this
@@ -2790,7 +2819,7 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 84,
+          lineNumber: 86,
           columnNumber: 17
         },
         this
@@ -2810,16 +2839,16 @@ function Field({
           children: [
             /* @__PURE__ */ jsxDEV26("option", { children: "-" }, void 0, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-              lineNumber: 110,
+              lineNumber: 112,
               columnNumber: 21
             }, this),
             ["create", "edit", "search", "find"].includes(String(state)) ? dic?.data_edit.map((item) => /* @__PURE__ */ jsxDEV26("option", { value: item.id, children: item[`title_${i18n.language}`] }, item.id, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-              lineNumber: 113,
+              lineNumber: 115,
               columnNumber: 29
             }, this)) : dic?.data_browse.map((item) => /* @__PURE__ */ jsxDEV26("option", { value: item.id, children: item[`title_${i18n.language}`] }, item.id, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-              lineNumber: 116,
+              lineNumber: 118,
               columnNumber: 29
             }, this))
           ]
@@ -2828,7 +2857,7 @@ function Field({
         !0,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 101,
+          lineNumber: 103,
           columnNumber: 17
         },
         this
@@ -2852,7 +2881,7 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 122,
+          lineNumber: 124,
           columnNumber: 17
         },
         this
@@ -2876,13 +2905,57 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 137,
+          lineNumber: 139,
           columnNumber: 17
         },
         this
       );
     case "FILE":
-      return /* @__PURE__ */ jsxDEV26(
+      return /* @__PURE__ */ jsxDEV26(Fragment, { children: defaultVal ? /* @__PURE__ */ jsxDEV26(
+        "div",
+        {
+          className: `${cls} p-1 flex items-baseline mb-3`,
+          children: [
+            /* @__PURE__ */ jsxDEV26(
+              "div",
+              {
+                className: "font-bold text-sm mr-1 min-w-40",
+                children: fieldTitle
+              },
+              void 0,
+              !1,
+              {
+                fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+                lineNumber: 159,
+                columnNumber: 29
+              },
+              this
+            ),
+            defaultVal instanceof File ? /* @__PURE__ */ jsxDEV26("div", { className: "text-primary", children: defaultVal.name }, void 0, !1, {
+              fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+              lineNumber: 166,
+              columnNumber: 39
+            }, this) : /* @__PURE__ */ jsxDEV26("a", { className: "text-primary underline", href: defaultVal, children: defaultVal }, void 0, !1, {
+              fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+              lineNumber: 169,
+              columnNumber: 39
+            }, this),
+            /* @__PURE__ */ jsxDEV26("button", { children: "Delete" }, void 0, !1, {
+              fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+              lineNumber: 173,
+              columnNumber: 29
+            }, this)
+          ]
+        },
+        void 0,
+        !0,
+        {
+          fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+          lineNumber: 156,
+          columnNumber: 27
+        },
+        this
+      ) : /* @__PURE__ */ jsxDEV26(
         CustomInput,
         {
           className: cls,
@@ -2898,11 +2971,15 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 152,
-          columnNumber: 17
+          lineNumber: 175,
+          columnNumber: 27
         },
         this
-      );
+      ) }, void 0, !1, {
+        fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+        lineNumber: 154,
+        columnNumber: 17
+      }, this);
   }
 }
 
@@ -2946,7 +3023,7 @@ function SingleGroup({ state, dictionaries, group, doc, setDoc }) {
 
 // app/components/UI/widgets/enter_data/edit_form/multy_group.tsx
 import { useTranslation as useTranslation14 } from "react-i18next";
-import { jsxDEV as jsxDEV28 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment2, jsxDEV as jsxDEV28 } from "react/jsx-dev-runtime";
 function MultyGroup({
   state,
   dictionaries,
@@ -2967,7 +3044,7 @@ function MultyGroup({
     }
   }, handleEdit = (e, recordIndex) => {
     e.preventDefault(), setRecordIndex(recordIndex), setGroup(group);
-  };
+  }, isEdit = ["edit", "create"].includes(String(state));
   return /* @__PURE__ */ jsxDEV28("div", { className: "border p-1 flex flex-col gap-3", children: [
     /* @__PURE__ */ jsxDEV28("div", { className: "mt-2", children: state === "create" || state === "edit" ? /* @__PURE__ */ jsxDEV28(
       CustomButton,
@@ -2977,11 +3054,11 @@ function MultyGroup({
         children: [
           /* @__PURE__ */ jsxDEV28("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV28("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M12 4.5v15m7.5-7.5h-15" }, void 0, !1, {
             fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-            lineNumber: 59,
+            lineNumber: 60,
             columnNumber: 29
           }, this) }, void 0, !1, {
             fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-            lineNumber: 58,
+            lineNumber: 59,
             columnNumber: 25
           }, this),
           t("add")
@@ -2991,19 +3068,19 @@ function MultyGroup({
       !0,
       {
         fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-        lineNumber: 54,
+        lineNumber: 55,
         columnNumber: 23
       },
       this
     ) : null }, void 0, !1, {
       fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-      lineNumber: 52,
+      lineNumber: 53,
       columnNumber: 13
     }, this),
     /* @__PURE__ */ jsxDEV28(
       "table",
       {
-        className: "border border-blue-gray-700",
+        className: "border border-blue-gray-700 w-fit",
         children: [
           /* @__PURE__ */ jsxDEV28(
             "thead",
@@ -3012,27 +3089,33 @@ function MultyGroup({
               children: /* @__PURE__ */ jsxDEV28("tr", { children: [
                 /* @__PURE__ */ jsxDEV28("th", { className: "p-1 text-sm border border-blue-gray-700", children: "#" }, void 0, !1, {
                   fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                  lineNumber: 72,
+                  lineNumber: 73,
                   columnNumber: 25
                 }, this),
                 group?.fields && group.fields.map((fld) => /* @__PURE__ */ jsxDEV28("th", { className: "p-1 text-sm border border-blue-gray-700", children: fld[`title_${i18n.language}`] }, fld.id, !1, {
                   fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                  lineNumber: 74,
+                  lineNumber: 75,
                   columnNumber: 29
                 }, this)),
-                /* @__PURE__ */ jsxDEV28("th", { className: "p-1 text-sm border border-blue-gray-700" }, void 0, !1, {
+                isEdit ? /* @__PURE__ */ jsxDEV28(Fragment2, { children: [
+                  /* @__PURE__ */ jsxDEV28("th", { className: "p-1 text-sm border border-blue-gray-700" }, void 0, !1, {
+                    fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
+                    lineNumber: 81,
+                    columnNumber: 33
+                  }, this),
+                  /* @__PURE__ */ jsxDEV28("th", { className: "p-1 text-sm border border-blue-gray-700" }, void 0, !1, {
+                    fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
+                    lineNumber: 82,
+                    columnNumber: 33
+                  }, this)
+                ] }, void 0, !0, {
                   fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                  lineNumber: 78,
-                  columnNumber: 25
-                }, this),
-                /* @__PURE__ */ jsxDEV28("th", { className: "p-1 text-sm border border-blue-gray-700" }, void 0, !1, {
-                  fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                  lineNumber: 79,
-                  columnNumber: 25
-                }, this)
+                  lineNumber: 80,
+                  columnNumber: 31
+                }, this) : null
               ] }, void 0, !0, {
                 fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                lineNumber: 71,
+                lineNumber: 72,
                 columnNumber: 21
               }, this)
             },
@@ -3040,7 +3123,7 @@ function MultyGroup({
             !1,
             {
               fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-              lineNumber: 68,
+              lineNumber: 69,
               columnNumber: 17
             },
             this
@@ -3048,7 +3131,7 @@ function MultyGroup({
           /* @__PURE__ */ jsxDEV28("tbody", { children: doc[`tbl_${group?.id}`].map((record, index) => /* @__PURE__ */ jsxDEV28("tr", { children: [
             /* @__PURE__ */ jsxDEV28("td", { className: "p-1 text-sm border border-blue-gray-700", children: index + 1 }, void 0, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-              lineNumber: 85,
+              lineNumber: 90,
               columnNumber: 29
             }, this),
             group?.fields && group.fields.map((fld) => {
@@ -3059,77 +3142,86 @@ function MultyGroup({
                   let dicVal = dic.data_browse.find((item) => item.id === Number(val));
                   dicVal && (val = dicVal[`title_${i18n.language}`]);
                 }
-              } else
-                fld.fieldType === "FILE" && (val = "");
-              return /* @__PURE__ */ jsxDEV28("th", { className: "p-1 text-sm border border-blue-gray-700", children: val }, fld.id, !1, {
+              }
+              return /* @__PURE__ */ jsxDEV28("td", { className: "p-1 text-sm border border-blue-gray-700", children: fld.fieldType === "FILE" ? val instanceof File ? val.name : /* @__PURE__ */ jsxDEV28("a", { className: "text-primary underline", href: val, children: val }, void 0, !1, {
                 fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                lineNumber: 100,
+                lineNumber: 107,
+                columnNumber: 51
+              }, this) : val }, fld.id, !1, {
+                fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
+                lineNumber: 103,
                 columnNumber: 37
               }, this);
             }),
-            ["edit", "create"].includes(String(state)) ? /* @__PURE__ */ jsxDEV28("td", { className: "p-1 text-sm border border-blue-gray-700 w-10", children: /* @__PURE__ */ jsxDEV28(
-              CustomButton,
-              {
-                className: "bg-primary hover:shadow-primary_shadow",
-                onClick: (e) => handleEdit(e, index),
-                children: /* @__PURE__ */ jsxDEV28("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV28("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" }, void 0, !1, {
+            isEdit ? /* @__PURE__ */ jsxDEV28(Fragment2, { children: [
+              /* @__PURE__ */ jsxDEV28("td", { className: "p-1 text-sm border border-blue-gray-700 w-10", children: /* @__PURE__ */ jsxDEV28(
+                CustomButton,
+                {
+                  className: "bg-primary hover:shadow-primary_shadow",
+                  onClick: (e) => handleEdit(e, index),
+                  children: /* @__PURE__ */ jsxDEV28("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV28("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" }, void 0, !1, {
+                    fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
+                    lineNumber: 122,
+                    columnNumber: 49
+                  }, this) }, void 0, !1, {
+                    fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
+                    lineNumber: 121,
+                    columnNumber: 45
+                  }, this)
+                },
+                void 0,
+                !1,
+                {
                   fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                  lineNumber: 112,
-                  columnNumber: 45
-                }, this) }, void 0, !1, {
-                  fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                  lineNumber: 111,
+                  lineNumber: 117,
                   columnNumber: 41
-                }, this)
-              },
-              void 0,
-              !1,
-              {
+                },
+                this
+              ) }, void 0, !1, {
                 fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                lineNumber: 107,
+                lineNumber: 116,
                 columnNumber: 37
-              },
-              this
-            ) }, void 0, !1, {
-              fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-              lineNumber: 106,
-              columnNumber: 35
-            }, this) : null,
-            ["edit", "create"].includes(String(state)) ? /* @__PURE__ */ jsxDEV28("td", { className: "p-1 text-sm border border-blue-gray-700 w-10", children: /* @__PURE__ */ jsxDEV28(
-              CustomButton,
-              {
-                className: "bg-danger hover:shadow-danger_shadow",
-                onClick: (e) => handleDelete(e, index),
-                children: /* @__PURE__ */ jsxDEV28("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV28("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" }, void 0, !1, {
+              }, this),
+              /* @__PURE__ */ jsxDEV28("td", { className: "p-1 text-sm border border-blue-gray-700 w-10", children: /* @__PURE__ */ jsxDEV28(
+                CustomButton,
+                {
+                  className: "bg-danger hover:shadow-danger_shadow",
+                  onClick: (e) => handleDelete(e, index),
+                  children: /* @__PURE__ */ jsxDEV28("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV28("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" }, void 0, !1, {
+                    fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
+                    lineNumber: 132,
+                    columnNumber: 49
+                  }, this) }, void 0, !1, {
+                    fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
+                    lineNumber: 131,
+                    columnNumber: 45
+                  }, this)
+                },
+                void 0,
+                !1,
+                {
                   fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                  lineNumber: 124,
-                  columnNumber: 45
-                }, this) }, void 0, !1, {
-                  fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                  lineNumber: 123,
+                  lineNumber: 127,
                   columnNumber: 41
-                }, this)
-              },
-              void 0,
-              !1,
-              {
+                },
+                this
+              ) }, void 0, !1, {
                 fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-                lineNumber: 119,
+                lineNumber: 126,
                 columnNumber: 37
-              },
-              this
-            ) }, void 0, !1, {
+              }, this)
+            ] }, void 0, !0, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-              lineNumber: 118,
+              lineNumber: 115,
               columnNumber: 35
             }, this) : null
           ] }, index, !0, {
             fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-            lineNumber: 84,
+            lineNumber: 89,
             columnNumber: 25
           }, this)) }, void 0, !1, {
             fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-            lineNumber: 82,
+            lineNumber: 87,
             columnNumber: 17
           }, this)
         ]
@@ -3138,14 +3230,14 @@ function MultyGroup({
       !0,
       {
         fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-        lineNumber: 65,
+        lineNumber: 66,
         columnNumber: 13
       },
       this
     )
   ] }, void 0, !0, {
     fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
-    lineNumber: 51,
+    lineNumber: 52,
     columnNumber: 9
   }, this);
 }
@@ -3183,6 +3275,8 @@ function EditForm({
                   let fieldName = `f${fld.id}`, r = `${tableName}__${fieldName}__${i}`;
                   formData.append(r, doc[tableName][i][fieldName]);
                 });
+            else
+              formData.append(`${tableName}__id`, doc[tableName][0].id);
           }
         ), console.log(Object.fromEntries(formData)), submit(formData, {
           method: "post",
@@ -3192,17 +3286,17 @@ function EditForm({
       children: [
         /* @__PURE__ */ jsxDEV29("input", { type: "hidden", name: "_user", value: userId }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-          lineNumber: 68,
+          lineNumber: 70,
           columnNumber: 17
         }, this),
         /* @__PURE__ */ jsxDEV29("input", { type: "hidden", name: "_inputFormId", value: inputForm.id }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-          lineNumber: 69,
+          lineNumber: 71,
           columnNumber: 17
         }, this),
         /* @__PURE__ */ jsxDEV29("input", { type: "hidden", name: "_id", value: doc.id ? doc.id : "" }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-          lineNumber: 70,
+          lineNumber: 72,
           columnNumber: 17
         }, this),
         inputForm?.groups && inputForm.groups.map((group) => {
@@ -3210,7 +3304,7 @@ function EditForm({
           return /* @__PURE__ */ jsxDEV29("div", { className: "mb-2", children: [
             /* @__PURE__ */ jsxDEV29("h2", { className: "col-span-3 bg-primary text-white font-bold text-sm p-1 pl-4", children: groupTitle }, void 0, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-              lineNumber: 75,
+              lineNumber: 77,
               columnNumber: 29
             }, this),
             group.isMulty ? /* @__PURE__ */ jsxDEV29(
@@ -3228,7 +3322,7 @@ function EditForm({
               !1,
               {
                 fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-                lineNumber: 86,
+                lineNumber: 88,
                 columnNumber: 35
               },
               this
@@ -3245,14 +3339,14 @@ function EditForm({
               !1,
               {
                 fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-                lineNumber: 79,
+                lineNumber: 81,
                 columnNumber: 35
               },
               this
             )
           ] }, group.id, !0, {
             fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-            lineNumber: 74,
+            lineNumber: 76,
             columnNumber: 25
           }, this);
         })
@@ -3262,13 +3356,13 @@ function EditForm({
     !0,
     {
       fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-      lineNumber: 61,
+      lineNumber: 63,
       columnNumber: 13
     },
     this
   ) }, void 0, !1, {
     fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-    lineNumber: 60,
+    lineNumber: 62,
     columnNumber: 9
   }, this);
 }
@@ -3276,7 +3370,7 @@ function EditForm({
 // app/components/UI/widgets/enter_data/dlg_multy_group.tsx
 import MaterialTailwind4 from "@material-tailwind/react";
 import { useTranslation as useTranslation16 } from "react-i18next";
-import { Fragment, jsxDEV as jsxDEV30 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment3, jsxDEV as jsxDEV30 } from "react/jsx-dev-runtime";
 var { Dialog: Dialog3, Card: Card3, CardBody: CardBody3, CardFooter: CardFooter3 } = MaterialTailwind4;
 function DialogMultyGroup({
   state,
@@ -3306,13 +3400,17 @@ function DialogMultyGroup({
             method: "post",
             onSubmit: (e) => {
               if (e.preventDefault(), group) {
-                let formData = new FormData(e.currentTarget), values = Object.fromEntries(formData), d = { ...doc };
+                let formData = new FormData(e.currentTarget), values = Object.fromEntries(formData);
+                group.fields.forEach((fld) => {
+                  console.log(formData.get(`f${fld.id}`));
+                });
+                let d = { ...doc };
                 recordIndex >= 0 ? d[`tbl_${group.id}`][recordIndex] = { ...values } : d[`tbl_${group.id}`].push({ ...values }), setDoc(d), setGroup(null);
               }
             },
             children: group?.fields ? group.fields.map((fld) => {
               let cls = `col-span-${fld.colSpan} col-start-${fld.colStart}`, fieldName = `f${fld.id}`, fieldTitle = fld[`title_${i18n.language}`], fieldLen = fld.len ? fld.len : 30, fieldRequired = fld.isRequire && state === "edit", fieldDisabled = !fld.isEnable || !["create", "edit", "search", "find"].includes(String(state)), tableName = `tbl_${fld.groupId}`, val = "";
-              return recordIndex >= 0 && doc[tableName].length && (val = doc[tableName][recordIndex][fieldName]), fld.fieldType === "FILE" && (val = ""), /* @__PURE__ */ jsxDEV30(
+              return recordIndex >= 0 && doc[tableName].length && (val = doc[tableName][recordIndex][fieldName]), /* @__PURE__ */ jsxDEV30(
                 Field,
                 {
                   cls,
@@ -3336,7 +3434,7 @@ function DialogMultyGroup({
                 },
                 this
               );
-            }) : /* @__PURE__ */ jsxDEV30(Fragment, { children: "-" }, void 0, !1, {
+            }) : /* @__PURE__ */ jsxDEV30(Fragment3, { children: "-" }, void 0, !1, {
               fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
               lineNumber: 98,
               columnNumber: 30
@@ -3346,13 +3444,13 @@ function DialogMultyGroup({
           !1,
           {
             fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-            lineNumber: 61,
+            lineNumber: 64,
             columnNumber: 21
           },
           this
         ) }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-          lineNumber: 60,
+          lineNumber: 63,
           columnNumber: 17
         }, this),
         /* @__PURE__ */ jsxDEV30(CardFooter3, { className: "pt-0 flex flex-row gap-3 justify-center", placeholder: "", children: [
@@ -3396,7 +3494,7 @@ function DialogMultyGroup({
         }, this)
       ] }, void 0, !0, {
         fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-        lineNumber: 59,
+        lineNumber: 62,
         columnNumber: 13
       }, this)
     },
@@ -3404,7 +3502,7 @@ function DialogMultyGroup({
     !1,
     {
       fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-      lineNumber: 52,
+      lineNumber: 55,
       columnNumber: 9
     },
     this
@@ -4373,7 +4471,7 @@ function ButtonAddSearchForm({ count }) {
 import MaterialTailwind5 from "@material-tailwind/react";
 import { Form as Form9, useFetcher } from "@remix-run/react";
 import { useTranslation as useTranslation24 } from "react-i18next";
-import { Fragment as Fragment2, jsxDEV as jsxDEV43 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment4, jsxDEV as jsxDEV43 } from "react/jsx-dev-runtime";
 var { Spinner } = MaterialTailwind5;
 function ButtonRestructDb() {
   let { t } = useTranslation24(), isRestruct = useFetcher().state !== "idle";
@@ -4390,7 +4488,7 @@ function ButtonRestructDb() {
           "Please confirm you want to restructure database."
         ) || event.preventDefault();
       },
-      children: isRestruct ? /* @__PURE__ */ jsxDEV43(Fragment2, { children: [
+      children: isRestruct ? /* @__PURE__ */ jsxDEV43(Fragment4, { children: [
         /* @__PURE__ */ jsxDEV43(Spinner, { className: "w-4 h-4" }, void 0, !1, {
           fileName: "app/components/UI/widgets/db_struct/buttons/btn_restruct_db.tsx",
           lineNumber: 32,
@@ -4402,7 +4500,7 @@ function ButtonRestructDb() {
         fileName: "app/components/UI/widgets/db_struct/buttons/btn_restruct_db.tsx",
         lineNumber: 31,
         columnNumber: 23
-      }, this) : /* @__PURE__ */ jsxDEV43(Fragment2, { children: [
+      }, this) : /* @__PURE__ */ jsxDEV43(Fragment4, { children: [
         /* @__PURE__ */ jsxDEV43("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV43("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" }, void 0, !1, {
           fileName: "app/components/UI/widgets/db_struct/buttons/btn_restruct_db.tsx",
           lineNumber: 37,
@@ -4837,14 +4935,14 @@ function DbStructNav({
 // app/components/UI/widgets/db_struct/forms/form_dict.tsx
 import { Form as Form10 } from "@remix-run/react";
 import { useTranslation as useTranslation26 } from "react-i18next";
-import { Fragment as Fragment3, jsxDEV as jsxDEV46 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment5, jsxDEV as jsxDEV46 } from "react/jsx-dev-runtime";
 function DictionaryForm({ dictionary }) {
   let { i18n, t } = useTranslation26(), handleDelete = async (event) => {
     confirm(
       t("confirm_delete")
     ) || event.preventDefault();
   };
-  return /* @__PURE__ */ jsxDEV46(Fragment3, { children: [
+  return /* @__PURE__ */ jsxDEV46(Fragment5, { children: [
     /* @__PURE__ */ jsxDEV46("div", { className: "flex flex-row gap-3 justify-end", children: [
       /* @__PURE__ */ jsxDEV46(
         CustomButton,
@@ -5003,14 +5101,14 @@ function DictionaryForm({ dictionary }) {
 import { Form as Form11, useNavigate as useNavigate8 } from "@remix-run/react";
 import { FieldType } from "@prisma/client";
 import { useTranslation as useTranslation27 } from "react-i18next";
-import { Fragment as Fragment4, jsxDEV as jsxDEV47 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment6, jsxDEV as jsxDEV47 } from "react/jsx-dev-runtime";
 function GroupForm({ group, dicts }) {
   let { i18n, t } = useTranslation27(), navigate = useNavigate8(), handleDelete = async (event) => {
     confirm(
       t("confirm_delete")
     ) || event.preventDefault();
   };
-  return /* @__PURE__ */ jsxDEV47(Fragment4, { children: [
+  return /* @__PURE__ */ jsxDEV47(Fragment6, { children: [
     /* @__PURE__ */ jsxDEV47("div", { className: "flex flex-row gap-3 justify-end", children: [
       /* @__PURE__ */ jsxDEV47(
         CustomButton,
@@ -6002,10 +6100,10 @@ function GroupForm({ group, dicts }) {
 // app/components/UI/widgets/db_struct/forms/form_input.tsx
 import { Form as Form12 } from "@remix-run/react";
 import { useTranslation as useTranslation28 } from "react-i18next";
-import { Fragment as Fragment5, jsxDEV as jsxDEV48 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment7, jsxDEV as jsxDEV48 } from "react/jsx-dev-runtime";
 function InputFormForm({ inputForm, groups }) {
   let { t } = useTranslation28();
-  return /* @__PURE__ */ jsxDEV48(Fragment5, { children: [
+  return /* @__PURE__ */ jsxDEV48(Fragment7, { children: [
     /* @__PURE__ */ jsxDEV48("div", { className: "flex flex-row gap-3 justify-end", children: [
       /* @__PURE__ */ jsxDEV48(
         CustomButton,
@@ -6257,14 +6355,14 @@ function InputFormForm({ inputForm, groups }) {
 // app/components/UI/widgets/db_struct/forms/form_search.tsx
 import { Form as Form13 } from "@remix-run/react";
 import { useTranslation as useTranslation29 } from "react-i18next";
-import { Fragment as Fragment6, jsxDEV as jsxDEV49 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment8, jsxDEV as jsxDEV49 } from "react/jsx-dev-runtime";
 function SearchFormForm({ searchForm, inputFields }) {
   let { i18n, t } = useTranslation29(), handleDelete = async (event) => {
     confirm(
       t("confirm_delete")
     ) || event.preventDefault();
   };
-  return /* @__PURE__ */ jsxDEV49(Fragment6, { children: [
+  return /* @__PURE__ */ jsxDEV49(Fragment8, { children: [
     /* @__PURE__ */ jsxDEV49("div", { className: "flex flex-row gap-3 justify-end", children: [
       /* @__PURE__ */ jsxDEV49(
         CustomButton,
@@ -8003,10 +8101,10 @@ function ButtonDeleteRole({ roleId }) {
 }
 
 // app/components/UI/widgets/users/tbl_roles.tsx
-import { Fragment as Fragment7, jsxDEV as jsxDEV59 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment9, jsxDEV as jsxDEV59 } from "react/jsx-dev-runtime";
 function RolesTable({ role, roles }) {
   let navigate = useNavigate12(), { i18n, t } = useTranslation36();
-  return /* @__PURE__ */ jsxDEV59(Fragment7, { children: [
+  return /* @__PURE__ */ jsxDEV59(Fragment9, { children: [
     roles.map((role2) => /* @__PURE__ */ jsxDEV59(
       Form17,
       {
@@ -8278,10 +8376,10 @@ function ButtonDeleteAccessInputForm({ aform }) {
 }
 
 // app/components/UI/widgets/users/tbl_ainputforms.tsx
-import { Fragment as Fragment8, jsxDEV as jsxDEV61 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment10, jsxDEV as jsxDEV61 } from "react/jsx-dev-runtime";
 function AccessInputFormsTable({ aforms, inputForms }) {
   let { i18n, t } = useTranslation38();
-  return /* @__PURE__ */ jsxDEV61(Fragment8, { children: [
+  return /* @__PURE__ */ jsxDEV61(Fragment10, { children: [
     aforms && aforms.map((aform) => /* @__PURE__ */ jsxDEV61(
       Form19,
       {
@@ -8688,10 +8786,10 @@ function ButtonDeleteAccessSearchForm({ aform }) {
 }
 
 // app/components/UI/widgets/users/tbl_asearchforms.tsx
-import { Fragment as Fragment9, jsxDEV as jsxDEV66 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment11, jsxDEV as jsxDEV66 } from "react/jsx-dev-runtime";
 function AccessSearchFormsTable({ aforms, searchForms }) {
   let { i18n, t } = useTranslation43();
-  return /* @__PURE__ */ jsxDEV66(Fragment9, { children: [
+  return /* @__PURE__ */ jsxDEV66(Fragment11, { children: [
     aforms && aforms.map((aform) => /* @__PURE__ */ jsxDEV66(
       Form24,
       {
@@ -9019,10 +9117,10 @@ function ButtonDeleteUserRole({ userRoleId, userId }) {
 
 // app/components/UI/widgets/users/tbl_roles_only_title.tsx
 import { Form as Form26 } from "@remix-run/react";
-import { Fragment as Fragment10, jsxDEV as jsxDEV69 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment12, jsxDEV as jsxDEV69 } from "react/jsx-dev-runtime";
 function RolesOnlyTitleTable({ userRoles, roles }) {
   let { i18n, t } = useTranslation46();
-  return /* @__PURE__ */ jsxDEV69(Fragment10, { children: [
+  return /* @__PURE__ */ jsxDEV69(Fragment12, { children: [
     userRoles && userRoles.map((ur) => /* @__PURE__ */ jsxDEV69(
       Form26,
       {
@@ -9901,7 +9999,7 @@ import MaterialTailwind9 from "@material-tailwind/react";
 
 // app/components/UI/widgets/dashboard/menu/nav_list_menu.tsx
 import MaterialTailwind8 from "@material-tailwind/react";
-import { Fragment as Fragment11, createElement, useState as useState7 } from "react";
+import { Fragment as Fragment13, createElement, useState as useState7 } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Link as Link4 } from "@remix-run/react";
 import { jsxDEV as jsxDEV74 } from "react/jsx-dev-runtime";
@@ -9974,7 +10072,7 @@ function NavListMenu({ menuTitle, navListMenuItems }) {
       columnNumber: 13
     }, this)
   );
-  return /* @__PURE__ */ jsxDEV74(Fragment11, { children: [
+  return /* @__PURE__ */ jsxDEV74(Fragment13, { children: [
     /* @__PURE__ */ jsxDEV74(
       Menu,
       {
@@ -10477,7 +10575,7 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-QR2IZ3WB.js", imports: ["/build/_shared/chunk-OAPPX4FA.js", "/build/_shared/chunk-Z46RVADL.js", "/build/_shared/chunk-AX7SAOSU.js", "/build/_shared/chunk-7PHB3BFD.js", "/build/_shared/chunk-FQWAC4DA.js", "/build/_shared/chunk-SOESSFXD.js", "/build/_shared/chunk-JR22VO6P.js", "/build/_shared/chunk-WEAPBHQG.js", "/build/_shared/chunk-CJ4MY3PQ.js", "/build/_shared/chunk-PZDJHGND.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-F2YGQMMJ.js", imports: void 0, hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-JCFTVRU3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard": { id: "routes/dashboard", parentId: "root", path: "dashboard", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard-VQRACQF4.js", imports: void 0, hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.db_struct": { id: "routes/dashboard.db_struct", parentId: "routes/dashboard", path: "db_struct", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.db_struct-QZEH5X42.js", imports: ["/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.dictionaries": { id: "routes/dashboard.dictionaries", parentId: "routes/dashboard", path: "dictionaries", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.dictionaries-3KN53QRW.js", imports: ["/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.enter_data.$formId": { id: "routes/dashboard.enter_data.$formId", parentId: "routes/dashboard", path: "enter_data/:formId", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.enter_data.$formId-BZX6L6RY.js", imports: ["/build/_shared/chunk-MXYI6LSU.js", "/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.search_data.$formId": { id: "routes/dashboard.search_data.$formId", parentId: "routes/dashboard", path: "search_data/:formId", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.search_data.$formId-N5TB5HSY.js", imports: ["/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.users": { id: "routes/dashboard.users", parentId: "routes/dashboard", path: "users", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.users-H5MV6EHQ.js", imports: ["/build/_shared/chunk-MXYI6LSU.js", "/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "629f700e", hmr: { runtime: "/build/_shared/chunk-SOESSFXD.js", timestamp: 1710750896987 }, url: "/build/manifest-629F700E.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-QR2IZ3WB.js", imports: ["/build/_shared/chunk-OAPPX4FA.js", "/build/_shared/chunk-Z46RVADL.js", "/build/_shared/chunk-AX7SAOSU.js", "/build/_shared/chunk-7PHB3BFD.js", "/build/_shared/chunk-FQWAC4DA.js", "/build/_shared/chunk-SOESSFXD.js", "/build/_shared/chunk-JR22VO6P.js", "/build/_shared/chunk-WEAPBHQG.js", "/build/_shared/chunk-CJ4MY3PQ.js", "/build/_shared/chunk-PZDJHGND.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-V23H7CSP.js", imports: void 0, hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-JCFTVRU3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard": { id: "routes/dashboard", parentId: "root", path: "dashboard", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard-VQRACQF4.js", imports: void 0, hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.db_struct": { id: "routes/dashboard.db_struct", parentId: "routes/dashboard", path: "db_struct", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.db_struct-QZEH5X42.js", imports: ["/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.dictionaries": { id: "routes/dashboard.dictionaries", parentId: "routes/dashboard", path: "dictionaries", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.dictionaries-3KN53QRW.js", imports: ["/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.enter_data.$formId": { id: "routes/dashboard.enter_data.$formId", parentId: "routes/dashboard", path: "enter_data/:formId", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.enter_data.$formId-5RTYHYYB.js", imports: ["/build/_shared/chunk-255ORAUR.js", "/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.search_data.$formId": { id: "routes/dashboard.search_data.$formId", parentId: "routes/dashboard", path: "search_data/:formId", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.search_data.$formId-N5TB5HSY.js", imports: ["/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.users": { id: "routes/dashboard.users", parentId: "routes/dashboard", path: "users", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.users-BMBLX4PO.js", imports: ["/build/_shared/chunk-255ORAUR.js", "/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "9507dc88", hmr: { runtime: "/build/_shared/chunk-SOESSFXD.js", timestamp: 1710846922601 }, url: "/build/manifest-9507DC88.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "development", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

@@ -25,7 +25,7 @@ export default function ButtonDelete({ userId, inputFormId, doc }: ButtonDeleteP
             <input type="hidden" name="_inputFormId" value={inputFormId} />
             <input type="hidden" name="_id" value={doc.id ? doc.id : ''} />
             <CustomButton
-                className="bg-red-500 hover:shadow-red-100"
+                className="w-32 bg-red-500 hover:shadow-red-100"
                 onClick={handleDelete}
                 type="submit"
                 name="_action"

@@ -37,6 +37,9 @@ export default function DialogMultyGroup({
         if (group) {
             let formData = new FormData(e.currentTarget)
             let values = Object.fromEntries(formData)
+            group.fields.forEach((fld: InputField) => {
+                console.log(formData.get(`f${fld.id}`))
+            })
             let d = { ...doc }
             if (recordIndex >= 0) {
                 d[`tbl_${group.id}`][recordIndex] = { ...values }
@@ -71,12 +74,9 @@ export default function DialogMultyGroup({
                             let fieldRequired = fld.isRequire && state === 'edit'
                             let fieldDisabled = !fld.isEnable || !(['create', 'edit', 'search', 'find'].includes(String(state)))
                             let tableName = `tbl_${fld.groupId}`
-                            let val = ''
+                            let val: any = ''
                             if (recordIndex >= 0 && doc[tableName].length) {
                                 val = doc[tableName][recordIndex][fieldName]
-                            }
-                            if (fld.fieldType === 'FILE') {
-                                val = ''
                             }
 
                             return (

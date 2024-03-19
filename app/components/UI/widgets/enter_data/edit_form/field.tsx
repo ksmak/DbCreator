@@ -3,6 +3,8 @@ import CustomInput from "~/components/UI/elements/custom_input"
 import CustomSelect from "~/components/UI/elements/custom_select"
 import { useTranslation } from "react-i18next"
 import moment from "moment"
+import { getFileFromUrl } from "~/components/utils/utils"
+import { useEffect, useState } from "react"
 
 type FieldProps = {
     state: string | null,
@@ -15,7 +17,7 @@ type FieldProps = {
     fieldRequired: boolean,
     fieldDisabled: boolean,
     fieldDict: number | null,
-    defaultVal: string,
+    defaultVal: string | File,
 }
 
 export default function Field({
@@ -42,7 +44,7 @@ export default function Field({
                     title={fieldTitle}
                     type="text"
                     name={fieldName}
-                    defaultValue={defaultVal}
+                    defaultValue={defaultVal as string}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -57,7 +59,7 @@ export default function Field({
                     title={fieldTitle}
                     type="text"
                     name={fieldName}
-                    defaultValue={defaultVal}
+                    defaultValue={defaultVal as string}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -72,7 +74,7 @@ export default function Field({
                     title={fieldTitle}
                     type="number"
                     name={fieldName}
-                    defaultValue={defaultVal}
+                    defaultValue={defaultVal as string}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -88,7 +90,7 @@ export default function Field({
                     type="number"
                     step="0.01"
                     name={fieldName}
-                    defaultValue={defaultVal}
+                    defaultValue={defaultVal as string}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -103,7 +105,7 @@ export default function Field({
                     id={fieldName}
                     title={fieldTitle}
                     name={fieldName}
-                    defaultValue={defaultVal}
+                    defaultValue={defaultVal as string}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                 >
@@ -125,7 +127,7 @@ export default function Field({
                     title={fieldTitle}
                     type="date"
                     name={fieldName}
-                    defaultValue={moment(defaultVal, 'DD.MM.YYYY').format("YYYY-MM-DD")}
+                    defaultValue={moment(defaultVal as string, 'DD.MM.YYYY').format("YYYY-MM-DD")}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -140,7 +142,7 @@ export default function Field({
                     title={fieldTitle}
                     type="time"
                     name={fieldName}
-                    defaultValue={defaultVal}
+                    defaultValue={defaultVal as string}
                     required={fieldRequired}
                     disabled={fieldDisabled}
                     size={fieldLen}
@@ -149,16 +151,38 @@ export default function Field({
             )
         case "FILE":
             return (
-                <CustomInput
-                    className={cls}
-                    id={fieldName}
-                    title={fieldTitle}
-                    type="file"
-                    name={fieldName}
-                    defaultValue=""
-                    required={fieldRequired}
-                    disabled={fieldDisabled}
-                />
+                <>
+                    {defaultVal
+                        ? <div
+                            className={`${cls} p-1 flex items-baseline mb-3`}
+                        >
+                            <div
+                                className="font-bold text-sm mr-1 min-w-40"
+                            >
+                                {fieldTitle}
+                            </div>
+                            {
+                                defaultVal instanceof File
+                                    ? <div className="text-primary">
+                                        {defaultVal.name}
+                                    </div>
+                                    : <a className="text-primary underline" href={defaultVal}>
+                                        {defaultVal}
+                                    </a>
+                            }
+                            <button>Delete</button>
+                        </div>
+                        : <CustomInput
+                            className={cls}
+                            id={fieldName}
+                            title={fieldTitle}
+                            type="file"
+                            name={fieldName}
+                            defaultValue=""
+                            required={fieldRequired}
+                            disabled={fieldDisabled}
+                        />}
+                </>
             )
     }
 }

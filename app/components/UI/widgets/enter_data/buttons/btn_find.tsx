@@ -7,7 +7,7 @@ export default function ButtonFind() {
 
     return (
         <CustomButton
-            className="bg-blue-gray-500 hover:shadow-blue-gray-100"
+            className="w-32 bg-blue-gray-500 hover:shadow-blue-gray-100"
             form="documentForm"
             type="submit"
             name="_action"

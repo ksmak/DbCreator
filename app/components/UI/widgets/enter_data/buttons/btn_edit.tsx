@@ -13,7 +13,7 @@ export default function ButtonEdit({ inputFormId, docId }: ButtonEditProps) {
 
     return (
         <CustomButton
-            className="bg-blue-gray-500 hover:shadow-blue-gray-100"
+            className="w-32 bg-blue-gray-500 hover:shadow-blue-gray-100"
             onClick={() => navigate(`/dashboard/enter_data/${inputFormId}?state=edit&docId=${docId}`)}
         >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">

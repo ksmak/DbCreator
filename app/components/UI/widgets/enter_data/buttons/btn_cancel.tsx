@@ -14,7 +14,7 @@ export default function ButtonCancel({ inputFormId, docId }: ButtonCancelProps) 
     return (
         <CustomButton
             outline={true}
-            className="hover:shadow-primary_shadow text-primary border-primary"
+            className="w-32 hover:shadow-primary_shadow text-primary border-primary"
             onClick={() => navigate(`/dashboard/enter_data/${inputFormId}?docId=${docId}`)}
         >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">

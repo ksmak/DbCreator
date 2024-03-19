@@ -5,7 +5,7 @@ export default function ButtonSave() {
     const { t } = useTranslation()
     return (
         <CustomButton
-            className="bg-primary hover:shadow-primary_shadow"
+            className="w-32 bg-primary hover:shadow-primary_shadow"
             form="documentForm"
             type="submit"
             name="_action"

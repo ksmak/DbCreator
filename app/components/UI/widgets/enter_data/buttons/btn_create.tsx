@@ -12,7 +12,7 @@ export default function ButtonCreate({ inputFormId }: ButtonCreateProps) {
 
     return (
         <CustomButton
-            className="bg-primary hover:shadow-primary_shadow"
+            className="w-32 bg-primary hover:shadow-primary_shadow"
             onClick={() => navigate(`/dashboard/enter_data/${inputFormId}?state=create`)}
         >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">

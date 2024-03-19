@@ -47,6 +47,8 @@ export default function EditForm({
                             formData.append(r, doc[tableName][i][fieldName])
                         })
                     }
+                } else {
+                    formData.append(`${tableName}__id`, doc[tableName][0]["id"])
                 }
             })
         console.log(Object.fromEntries(formData))
