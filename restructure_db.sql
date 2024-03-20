@@ -25,19 +25,18 @@ BEGIN
 			SELECT 
 				field.id field_id, 
 				field."fieldType" field_type, 
-				field."precision" field_precision 
+				field."len" field_len,
+				field."scale" field_scale
 			FROM 
 				"InputField" field 
 			WHERE 
 				field."groupId" = r_tbls.id
 			LOOP
 				fld_type = 'text';
-				IF r_flds.field_type = 'TEXT' OR r_flds.field_type = 'CYRILLIC' OR r_flds.field_type = 'FILE' THEN
-					fld_type = 'text';
-				ELSIF r_flds.field_type = 'INTEGER' OR r_flds.field_type = 'DICT' THEN
+				IF r_flds.field_type = 'INTEGER' OR r_flds.field_type = 'DICT' THEN
 	    			fld_type = 'integer';
 				ELSIF r_flds.field_type = 'NUMERIC' THEN
-	    			fld_type = 'numeric(' || r_flds.field_precision || ')';
+	    			fld_type = 'numeric(' || r_flds.field_len || ', ' || r_flds.field_scale || ')';
 				ELSIF r_flds.field_type = 'DATE' THEN
 	    			fld_type = 'date';
 				ELSIF r_flds.field_type = 'TIME' THEN
@@ -52,31 +51,28 @@ BEGIN
 			SELECT 
 				field.id field_id, 
 				field."fieldType" field_type, 
-				field."precision" field_precision 
+				field."len" field_len,
+				field."scale" field_scale 
 			FROM 
 				"InputField" field 
 			WHERE 
 				field."groupId" = r_tbls.id
 			LOOP
 				SELECT 
-					data_type, 
-					numeric_precision,
-					column_default
+					data_type
   				FROM 
 					information_schema.columns
  				WHERE 
 					table_schema = 'public'
    					AND table_name   = 'tbl_' || r_tbls.id
    					AND column_name = 'f' || r_flds.field_id
-				INTO f_type, prec, f_def;
+				INTO f_type;
 				
 				fld_type = 'text';
-				IF r_flds.field_type = 'TEXT' OR r_flds.field_type = 'CYRILLIC' OR r_flds.field_type = 'FILE' THEN
-					fld_type = 'text';
-				ELSIF r_flds.field_type = 'INTEGER' OR r_flds.field_type = 'DICT' THEN
+				IF r_flds.field_type = 'INTEGER' OR r_flds.field_type = 'DICT' THEN
 	    			fld_type = 'integer';
 				ELSIF r_flds.field_type = 'NUMERIC' THEN
-	    			fld_type = 'numeric(' || r_flds.field_precision || ')';
+	    			fld_type = 'numeric(' || r_flds.field_len || ', ' || r_flds.field_scale || ')';
 				ELSIF r_flds.field_type = 'DATE' THEN
 	    			fld_type = 'date';
 				ELSIF r_flds.field_type = 'TIME' THEN

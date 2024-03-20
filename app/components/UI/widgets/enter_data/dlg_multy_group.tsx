@@ -37,9 +37,6 @@ export default function DialogMultyGroup({
         if (group) {
             let formData = new FormData(e.currentTarget)
             let values = Object.fromEntries(formData)
-            group.fields.forEach((fld: InputField) => {
-                console.log(formData.get(`f${fld.id}`))
-            })
             let d = { ...doc }
             if (recordIndex >= 0) {
                 d[`tbl_${group.id}`][recordIndex] = { ...values }
@@ -78,6 +75,21 @@ export default function DialogMultyGroup({
                             if (recordIndex >= 0 && doc[tableName].length) {
                                 val = doc[tableName][recordIndex][fieldName]
                             }
+                            let handleDeleteFile
+                            if (fld.fieldType === 'FILE') {
+                                handleDeleteFile = (e: MouseEvent<HTMLButtonElement>) => {
+                                    e.preventDefault()
+                                    const response = confirm(
+                                        t('confirm_delete')
+                                    )
+                                    if (!response) {
+                                        return
+                                    }
+                                    let d = { ...doc }
+                                    d[tableName][recordIndex][fieldName] = ""
+                                    setDoc(d)
+                                }
+                            }
 
                             return (
                                 <Field
@@ -93,6 +105,8 @@ export default function DialogMultyGroup({
                                     fieldDisabled={fieldDisabled}
                                     fieldDict={fld.dicId}
                                     defaultVal={val}
+                                    handleDeleteFile={handleDeleteFile}
+                                    fieldScale={fld.scale}
                                 />
                             )
                         }) : <>-</>}

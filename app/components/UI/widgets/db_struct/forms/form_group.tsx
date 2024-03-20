@@ -172,7 +172,7 @@ export default function GroupForm({ group, dicts }: GroupFormProps) {
                             <th className="p-1 text-sm border">{t('type_data')}</th>
                             <th className="p-1 text-sm border">{t('dictionary')}</th>
                             <th className="p-1 text-sm border">{t('len')}</th>
-                            <th className="p-1 text-sm border">{t('precision')}</th>
+                            <th className="p-1 text-sm border">{t('scale')}</th>
                             <th className="p-1 text-sm border">4</th>
                             <th className="p-1 text-sm border">5</th>
                             <th className="p-1 text-sm border">6</th>
@@ -310,8 +310,8 @@ export default function GroupForm({ group, dicts }: GroupFormProps) {
                                         className="text-sm w-full focus:outline-none"
                                         form={`updateInputFieldForm_${field.id}`}
                                         type="number"
-                                        name="precision"
-                                        defaultValue={field.precision}
+                                        name="scale"
+                                        defaultValue={field.scale}
                                         onChange={() => {
                                             const button = document.getElementById(`updateInputFieldButton_${field.id}`) as HTMLButtonElement
                                             button.click()

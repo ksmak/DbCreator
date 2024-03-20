@@ -142,7 +142,7 @@ model InputField {
   isVisible    Boolean        @default(true)
   isEnable     Boolean        @default(true)
   isRequire    Boolean        @default(false)
-  precision    Int            @default(0)
+  scale        Int            @default(0)
   isDuplicate  Boolean        @default(false)
   searchField  SearchField[]
   conditions   Condition[]

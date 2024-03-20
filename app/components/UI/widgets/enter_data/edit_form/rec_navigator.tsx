@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "@remix-run/react";
-import { ChangeEvent, Dispatch, KeyboardEvent, SetStateAction, useState } from "react";
+import { useNavigate } from "@remix-run/react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 type RecNavigatorProps = {

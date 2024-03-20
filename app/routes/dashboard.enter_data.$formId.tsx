@@ -22,7 +22,7 @@ export async function action({
     request,
 }: ActionFunctionArgs) {
     let ok: boolean = false
-    let errors: string = ''
+    let errors: string
     let docs: { formId?: number, ids?: number[] } | null = null
     let deletedDocId: number | null = null
     const uploadHandler = unstable_composeUploadHandlers(
@@ -41,6 +41,7 @@ export async function action({
         _id,
         ...values
     } = Object.fromEntries(formData)
+    ok = true
     switch (_action) {
         case 'saveDocument': {
             try {
@@ -65,14 +66,9 @@ export async function action({
             try {
                 let inputForm = await api.db.getInputForm(Number(_inputFormId))
                 const results: { id: number }[] | [] = await api.doc.findDoc(inputForm, formData)
-                if (results.length > 100) {
-                    errors = "Find records more 100"
-                } else {
-                    docs = {
-                        formId: inputForm.id,
-                        ids: results.map((item: any) => item.id)
-                    }
-                    ok = true
+                docs = {
+                    formId: inputForm.id,
+                    ids: results.map((item: any) => item.id)
                 }
             } catch (e) {
                 if (e instanceof Prisma.PrismaClientKnownRequestError) {
@@ -88,7 +84,9 @@ export async function action({
                 if (_id) {
                     await api.doc.deleteDoc(Number(_id))
                     deletedDocId = (Number(_id))
-                    ok = true
+                } else {
+                    errors = "Unknown id"
+                    ok = false
                 }
             } catch (e) {
                 if (e instanceof Prisma.PrismaClientKnownRequestError) {

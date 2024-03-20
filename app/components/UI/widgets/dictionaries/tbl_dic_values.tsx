@@ -49,7 +49,7 @@ export default function DicValuesTable({
                 </thead>
                 <tbody>
                     {dictValues && dictValues.map((item) => (
-                        <tr key={item.id} >
+                        <tr key={`${dictionary.id}_${item.id}`} >
                             <td className="p-1 text-sm border border-blue-gray-500 w-10">{item.id}</td>
                             <td className="p-1 text-sm border border-blue-gray-500">
                                 <input

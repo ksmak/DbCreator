@@ -125,7 +125,7 @@ import { useChangeLanguage } from "remix-i18next/react";
 import { useTranslation } from "react-i18next";
 
 // app/tailwind.css
-var tailwind_default = "/build/_assets/tailwind-AV7DHKZF.css";
+var tailwind_default = "/build/_assets/tailwind-NENF4P4Q.css";
 
 // app/root.tsx
 import { jsxDEV as jsxDEV2 } from "react/jsx-dev-runtime";
@@ -895,7 +895,7 @@ function DocModule(prisma2) {
       return prisma2.$transaction(tr);
     },
     updateDoc(userId, inputForm, formData, docId) {
-      let tr = [];
+      let sql = "", tr = [];
       tr.push(
         prisma2.doc.update({
           where: {
@@ -935,40 +935,48 @@ function DocModule(prisma2) {
                     vals = vals + `, '${fieldVal}'`;
                     break;
                   case "FILE":
-                    vals = vals + `, '/uploads/${fieldVal.name}'`;
+                    if (typeof fieldVal == "string" && fieldVal !== "")
+                      vals = vals + `, '${fieldVal}'`;
+                    else {
+                      let file = fieldVal;
+                      file.size > 0 ? vals = vals + `, '/uploads/${file.name}'` : vals = vals + ", null";
+                    }
                     break;
                   default:
                     vals = vals + `, ${fieldVal}`;
                     break;
                 }
             }
-            tr.push(prisma2.$executeRawUnsafe(`INSERT INTO ${tableName}(${flds}) VALUES(${vals})`));
+            sql = `INSERT INTO ${tableName}(${flds}) VALUES(${vals})`, tr.push(prisma2.$executeRawUnsafe(sql));
           }
         } else {
-          tr.push(prisma2.$executeRawUnsafe(`DELETE FROM ${tableName} WHERE sid=${docId}`));
-          let sets = " SET ", id = formData.get(`${tableName}__id`);
+          let id = formData.get(`${tableName}__id`), sets = "lst=0";
           for (let field of group.fields) {
             let fieldName = `f${field.id}`, fieldVal = formData.get(`${tableName}__${fieldName}__0`);
             if (["null", ""].includes(String(fieldVal)))
-              sets = sets + `, ${fieldName} = null`;
+              sets = sets + `, ${fieldName}=null`;
             else
               switch (field.fieldType) {
                 case "TEXT":
                 case "CYRILLIC":
                 case "DATE":
                 case "TIME":
-                  sets = sets + `, ${fieldName} = '${fieldVal}'`;
+                  sets = sets + `, ${fieldName}='${fieldVal}'`;
                   break;
                 case "FILE":
-                  let file = fieldVal;
-                  file.name && (sets = sets + `, ${fieldName} = '/uploads/${file.name}'`);
+                  if (typeof fieldVal == "string" && fieldVal !== "")
+                    sets = sets + `, ${fieldName}='${fieldVal}'`;
+                  else {
+                    let file = fieldVal;
+                    file.size > 0 ? sets = sets + `, ${fieldName}='/uploads/${file.name}'` : sets = sets + `, ${fieldName}=null`;
+                  }
                   break;
                 default:
-                  sets = sets + `, ${fieldName} = ${fieldVal}`;
+                  sets = sets + `, ${fieldName}=${fieldVal}`;
                   break;
               }
           }
-          tr.push(prisma2.$executeRawUnsafe(`UPDATE ${tableName} SET ${sets}) WHERE id={id}`));
+          sql = `UPDATE ${tableName} SET ${sets} WHERE id=${id}`, tr.push(prisma2.$executeRawUnsafe(sql));
         }
       }
       return prisma2.$transaction(tr);
@@ -980,16 +988,13 @@ function DocModule(prisma2) {
         for (let i = 0; i <= recCount; i++)
           for (let field of group.fields) {
             let fieldName = `f${field.id}`, fieldVal = formData.get(`${tableName}__${fieldName}__${i}`);
-            if (fieldVal)
+            if (fieldVal && field.fieldType !== "FILE")
               switch (tbls.includes(tableName) || (tbls.push(tableName), where = where + ` AND doc.id = ${tableName}.sid`, from = from + `, ${tableName}`), field.fieldType) {
                 case "TEXT":
                 case "CYRILLIC":
                 case "DATE":
                 case "TIME":
                   where = where + ` AND ${fieldName} = '${fieldVal}'`;
-                  break;
-                case "FILE":
-                  where = where + ` AND ${fieldName} = '/uploads/${fieldVal.name}'`;
                   break;
                 default:
                   where = where + ` AND ${fieldName} = ${fieldVal}`;
@@ -2711,7 +2716,7 @@ function CustomSelect({ className, id, title, errors, children, ...props }) {
 // app/components/UI/widgets/enter_data/edit_form/field.tsx
 import { useTranslation as useTranslation12 } from "react-i18next";
 import moment from "moment";
-import { Fragment, jsxDEV as jsxDEV26 } from "react/jsx-dev-runtime";
+import { jsxDEV as jsxDEV26 } from "react/jsx-dev-runtime";
 function Field({
   state,
   dictionaries,
@@ -2723,9 +2728,11 @@ function Field({
   fieldRequired,
   fieldDisabled,
   fieldDict,
-  defaultVal
+  defaultVal,
+  handleDeleteFile,
+  fieldScale
 }) {
-  let { i18n } = useTranslation12();
+  let { i18n, t } = useTranslation12();
   switch (fieldType) {
     case "TEXT":
       return /* @__PURE__ */ jsxDEV26(
@@ -2746,7 +2753,7 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 41,
+          lineNumber: 44,
           columnNumber: 17
         },
         this
@@ -2770,7 +2777,7 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 56,
+          lineNumber: 59,
           columnNumber: 17
         },
         this
@@ -2794,20 +2801,23 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 71,
+          lineNumber: 74,
           columnNumber: 17
         },
         this
       );
     case "NUMERIC":
-      return /* @__PURE__ */ jsxDEV26(
+      let step = "0.";
+      for (let i = 0; i < fieldScale - 1; i++)
+        step = step + "0";
+      return step = step + "1", /* @__PURE__ */ jsxDEV26(
         CustomInput,
         {
           className: cls,
           id: fieldName,
           title: fieldTitle,
           type: "number",
-          step: "0.01",
+          step,
           name: fieldName,
           defaultValue: defaultVal,
           required: fieldRequired,
@@ -2819,7 +2829,7 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 86,
+          lineNumber: 94,
           columnNumber: 17
         },
         this
@@ -2837,18 +2847,18 @@ function Field({
           required: fieldRequired,
           disabled: fieldDisabled,
           children: [
-            /* @__PURE__ */ jsxDEV26("option", { children: "-" }, void 0, !1, {
+            /* @__PURE__ */ jsxDEV26("option", { value: "", children: "-" }, void 0, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-              lineNumber: 112,
+              lineNumber: 120,
               columnNumber: 21
             }, this),
             ["create", "edit", "search", "find"].includes(String(state)) ? dic?.data_edit.map((item) => /* @__PURE__ */ jsxDEV26("option", { value: item.id, children: item[`title_${i18n.language}`] }, item.id, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-              lineNumber: 115,
+              lineNumber: 123,
               columnNumber: 29
             }, this)) : dic?.data_browse.map((item) => /* @__PURE__ */ jsxDEV26("option", { value: item.id, children: item[`title_${i18n.language}`] }, item.id, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-              lineNumber: 118,
+              lineNumber: 126,
               columnNumber: 29
             }, this))
           ]
@@ -2857,7 +2867,7 @@ function Field({
         !0,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 103,
+          lineNumber: 111,
           columnNumber: 17
         },
         this
@@ -2881,7 +2891,7 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 124,
+          lineNumber: 132,
           columnNumber: 17
         },
         this
@@ -2905,57 +2915,101 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 139,
+          lineNumber: 147,
           columnNumber: 17
         },
         this
       );
     case "FILE":
-      return /* @__PURE__ */ jsxDEV26(Fragment, { children: defaultVal ? /* @__PURE__ */ jsxDEV26(
-        "div",
-        {
-          className: `${cls} p-1 flex items-baseline mb-3`,
-          children: [
-            /* @__PURE__ */ jsxDEV26(
-              "div",
-              {
-                className: "font-bold text-sm mr-1 min-w-40",
-                children: fieldTitle
-              },
-              void 0,
-              !1,
-              {
-                fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-                lineNumber: 159,
-                columnNumber: 29
-              },
-              this
-            ),
-            defaultVal instanceof File ? /* @__PURE__ */ jsxDEV26("div", { className: "text-primary", children: defaultVal.name }, void 0, !1, {
+      return typeof defaultVal == "string" && defaultVal !== "" ? /* @__PURE__ */ jsxDEV26("div", { className: `${cls} p-1 flex gap-2 items-baseline mb-3`, children: [
+        /* @__PURE__ */ jsxDEV26("input", { type: "hidden", name: fieldName, defaultValue: defaultVal }, void 0, !1, {
+          fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+          lineNumber: 163,
+          columnNumber: 21
+        }, this),
+        /* @__PURE__ */ jsxDEV26("div", { className: "font-bold text-sm mr-1 min-w-40", children: fieldTitle }, void 0, !1, {
+          fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+          lineNumber: 164,
+          columnNumber: 21
+        }, this),
+        /* @__PURE__ */ jsxDEV26("a", { className: "text-primary underline", href: defaultVal, target: "_blank", children: defaultVal }, void 0, !1, {
+          fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+          lineNumber: 167,
+          columnNumber: 21
+        }, this),
+        state == "edit" && /* @__PURE__ */ jsxDEV26(
+          "button",
+          {
+            className: "p-1 rounded bg-danger shadow-danger_shadow text-white",
+            onClick: handleDeleteFile,
+            children: /* @__PURE__ */ jsxDEV26("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV26("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" }, void 0, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-              lineNumber: 166,
-              columnNumber: 39
-            }, this) : /* @__PURE__ */ jsxDEV26("a", { className: "text-primary underline", href: defaultVal, children: defaultVal }, void 0, !1, {
+              lineNumber: 175,
+              columnNumber: 33
+            }, this) }, void 0, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-              lineNumber: 169,
-              columnNumber: 39
-            }, this),
-            /* @__PURE__ */ jsxDEV26("button", { children: "Delete" }, void 0, !1, {
-              fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-              lineNumber: 173,
+              lineNumber: 174,
               columnNumber: 29
             }, this)
-          ]
-        },
-        void 0,
-        !0,
-        {
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+            lineNumber: 171,
+            columnNumber: 25
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+        lineNumber: 162,
+        columnNumber: 24
+      }, this) : defaultVal instanceof File && defaultVal.size > 0 ? /* @__PURE__ */ jsxDEV26("div", { className: `${cls} p-1 flex gap-2 items-baseline mb-3`, children: [
+        /* @__PURE__ */ jsxDEV26("input", { type: "hidden", name: fieldName, defaultValue: defaultVal.name }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 156,
-          columnNumber: 27
-        },
-        this
-      ) : /* @__PURE__ */ jsxDEV26(
+          lineNumber: 181,
+          columnNumber: 21
+        }, this),
+        /* @__PURE__ */ jsxDEV26("div", { className: "font-bold text-sm mr-1 min-w-40", children: fieldTitle }, void 0, !1, {
+          fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+          lineNumber: 182,
+          columnNumber: 21
+        }, this),
+        /* @__PURE__ */ jsxDEV26("div", { className: "text-primary", children: defaultVal.name }, void 0, !1, {
+          fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+          lineNumber: 185,
+          columnNumber: 21
+        }, this),
+        state == "edit" && /* @__PURE__ */ jsxDEV26(
+          "button",
+          {
+            className: "p-1 rounded bg-danger shadow-danger_shadow text-white",
+            onClick: handleDeleteFile,
+            children: /* @__PURE__ */ jsxDEV26("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV26("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" }, void 0, !1, {
+              fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+              lineNumber: 193,
+              columnNumber: 33
+            }, this) }, void 0, !1, {
+              fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+              lineNumber: 192,
+              columnNumber: 29
+            }, this)
+          },
+          void 0,
+          !1,
+          {
+            fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+            lineNumber: 189,
+            columnNumber: 25
+          },
+          this
+        )
+      ] }, void 0, !0, {
+        fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
+        lineNumber: 180,
+        columnNumber: 24
+      }, this) : /* @__PURE__ */ jsxDEV26(
         CustomInput,
         {
           className: cls,
@@ -2971,15 +3025,11 @@ function Field({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-          lineNumber: 175,
-          columnNumber: 27
+          lineNumber: 198,
+          columnNumber: 24
         },
         this
-      ) }, void 0, !1, {
-        fileName: "app/components/UI/widgets/enter_data/edit_form/field.tsx",
-        lineNumber: 154,
-        columnNumber: 17
-      }, this);
+      );
   }
 }
 
@@ -2987,10 +3037,19 @@ function Field({
 import { useTranslation as useTranslation13 } from "react-i18next";
 import { jsxDEV as jsxDEV27 } from "react/jsx-dev-runtime";
 function SingleGroup({ state, dictionaries, group, doc, setDoc }) {
-  let { i18n } = useTranslation13();
+  let { i18n, t } = useTranslation13();
   return /* @__PURE__ */ jsxDEV27("div", { className: "border p-1 grid grid-cols-3 gap-1", children: group?.fields && group.fields.map((fld) => {
     let cls = `col-span-${fld.colSpan} col-start-${fld.colStart}`, fieldName = `f${fld.id}`, fieldTitle = fld[`title_${i18n.language}`], fieldLen = fld.len ? fld.len : 30, fieldRequired = fld.isRequire && state === "edit", fieldDisabled = !fld.isEnable || !["create", "edit", "search", "find"].includes(String(state)), tableName = `tbl_${fld.groupId}`, val = "";
-    return doc[tableName].length && (val = doc[tableName][0][fieldName]), /* @__PURE__ */ jsxDEV27(
+    doc[tableName].length && (val = doc[tableName][0][fieldName]);
+    let handleDeleteFile;
+    return fld.fieldType === "FILE" && (handleDeleteFile = (e) => {
+      if (e.preventDefault(), !confirm(
+        t("confirm_delete")
+      ))
+        return;
+      let d = { ...doc };
+      d[tableName][0][fieldName] = "", setDoc(d);
+    }), /* @__PURE__ */ jsxDEV27(
       Field,
       {
         cls,
@@ -3003,13 +3062,15 @@ function SingleGroup({ state, dictionaries, group, doc, setDoc }) {
         fieldRequired,
         fieldDisabled,
         fieldDict: fld.dicId,
-        defaultVal: val
+        defaultVal: val,
+        handleDeleteFile,
+        fieldScale: fld.scale
       },
       fld.id,
       !1,
       {
         fileName: "app/components/UI/widgets/enter_data/edit_form/single_group.tsx",
-        lineNumber: 32,
+        lineNumber: 47,
         columnNumber: 21
       },
       this
@@ -3023,7 +3084,7 @@ function SingleGroup({ state, dictionaries, group, doc, setDoc }) {
 
 // app/components/UI/widgets/enter_data/edit_form/multy_group.tsx
 import { useTranslation as useTranslation14 } from "react-i18next";
-import { Fragment as Fragment2, jsxDEV as jsxDEV28 } from "react/jsx-dev-runtime";
+import { Fragment, jsxDEV as jsxDEV28 } from "react/jsx-dev-runtime";
 function MultyGroup({
   state,
   dictionaries,
@@ -3097,7 +3158,7 @@ function MultyGroup({
                   lineNumber: 75,
                   columnNumber: 29
                 }, this)),
-                isEdit ? /* @__PURE__ */ jsxDEV28(Fragment2, { children: [
+                isEdit ? /* @__PURE__ */ jsxDEV28(Fragment, { children: [
                   /* @__PURE__ */ jsxDEV28("th", { className: "p-1 text-sm border border-blue-gray-700" }, void 0, !1, {
                     fileName: "app/components/UI/widgets/enter_data/edit_form/multy_group.tsx",
                     lineNumber: 81,
@@ -3153,7 +3214,7 @@ function MultyGroup({
                 columnNumber: 37
               }, this);
             }),
-            isEdit ? /* @__PURE__ */ jsxDEV28(Fragment2, { children: [
+            isEdit ? /* @__PURE__ */ jsxDEV28(Fragment, { children: [
               /* @__PURE__ */ jsxDEV28("td", { className: "p-1 text-sm border border-blue-gray-700 w-10", children: /* @__PURE__ */ jsxDEV28(
                 CustomButton,
                 {
@@ -3278,7 +3339,7 @@ function EditForm({
             else
               formData.append(`${tableName}__id`, doc[tableName][0].id);
           }
-        ), console.log(Object.fromEntries(formData)), submit(formData, {
+        ), console.log(Object.fromEntries(formData)), console.log(doc), submit(formData, {
           method: "post",
           encType: "multipart/form-data"
         });
@@ -3286,17 +3347,17 @@ function EditForm({
       children: [
         /* @__PURE__ */ jsxDEV29("input", { type: "hidden", name: "_user", value: userId }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-          lineNumber: 70,
+          lineNumber: 71,
           columnNumber: 17
         }, this),
         /* @__PURE__ */ jsxDEV29("input", { type: "hidden", name: "_inputFormId", value: inputForm.id }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-          lineNumber: 71,
+          lineNumber: 72,
           columnNumber: 17
         }, this),
         /* @__PURE__ */ jsxDEV29("input", { type: "hidden", name: "_id", value: doc.id ? doc.id : "" }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-          lineNumber: 72,
+          lineNumber: 73,
           columnNumber: 17
         }, this),
         inputForm?.groups && inputForm.groups.map((group) => {
@@ -3304,7 +3365,7 @@ function EditForm({
           return /* @__PURE__ */ jsxDEV29("div", { className: "mb-2", children: [
             /* @__PURE__ */ jsxDEV29("h2", { className: "col-span-3 bg-primary text-white font-bold text-sm p-1 pl-4", children: groupTitle }, void 0, !1, {
               fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-              lineNumber: 77,
+              lineNumber: 78,
               columnNumber: 29
             }, this),
             group.isMulty ? /* @__PURE__ */ jsxDEV29(
@@ -3322,7 +3383,7 @@ function EditForm({
               !1,
               {
                 fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-                lineNumber: 88,
+                lineNumber: 89,
                 columnNumber: 35
               },
               this
@@ -3339,14 +3400,14 @@ function EditForm({
               !1,
               {
                 fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-                lineNumber: 81,
+                lineNumber: 82,
                 columnNumber: 35
               },
               this
             )
           ] }, group.id, !0, {
             fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-            lineNumber: 76,
+            lineNumber: 77,
             columnNumber: 25
           }, this);
         })
@@ -3356,13 +3417,13 @@ function EditForm({
     !0,
     {
       fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-      lineNumber: 63,
+      lineNumber: 64,
       columnNumber: 13
     },
     this
   ) }, void 0, !1, {
     fileName: "app/components/UI/widgets/enter_data/edit_form/edit_form.tsx",
-    lineNumber: 62,
+    lineNumber: 63,
     columnNumber: 9
   }, this);
 }
@@ -3370,7 +3431,7 @@ function EditForm({
 // app/components/UI/widgets/enter_data/dlg_multy_group.tsx
 import MaterialTailwind4 from "@material-tailwind/react";
 import { useTranslation as useTranslation16 } from "react-i18next";
-import { Fragment as Fragment3, jsxDEV as jsxDEV30 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment2, jsxDEV as jsxDEV30 } from "react/jsx-dev-runtime";
 var { Dialog: Dialog3, Card: Card3, CardBody: CardBody3, CardFooter: CardFooter3 } = MaterialTailwind4;
 function DialogMultyGroup({
   state,
@@ -3400,17 +3461,22 @@ function DialogMultyGroup({
             method: "post",
             onSubmit: (e) => {
               if (e.preventDefault(), group) {
-                let formData = new FormData(e.currentTarget), values = Object.fromEntries(formData);
-                group.fields.forEach((fld) => {
-                  console.log(formData.get(`f${fld.id}`));
-                });
-                let d = { ...doc };
+                let formData = new FormData(e.currentTarget), values = Object.fromEntries(formData), d = { ...doc };
                 recordIndex >= 0 ? d[`tbl_${group.id}`][recordIndex] = { ...values } : d[`tbl_${group.id}`].push({ ...values }), setDoc(d), setGroup(null);
               }
             },
             children: group?.fields ? group.fields.map((fld) => {
               let cls = `col-span-${fld.colSpan} col-start-${fld.colStart}`, fieldName = `f${fld.id}`, fieldTitle = fld[`title_${i18n.language}`], fieldLen = fld.len ? fld.len : 30, fieldRequired = fld.isRequire && state === "edit", fieldDisabled = !fld.isEnable || !["create", "edit", "search", "find"].includes(String(state)), tableName = `tbl_${fld.groupId}`, val = "";
-              return recordIndex >= 0 && doc[tableName].length && (val = doc[tableName][recordIndex][fieldName]), /* @__PURE__ */ jsxDEV30(
+              recordIndex >= 0 && doc[tableName].length && (val = doc[tableName][recordIndex][fieldName]);
+              let handleDeleteFile;
+              return fld.fieldType === "FILE" && (handleDeleteFile = (e) => {
+                if (e.preventDefault(), !confirm(
+                  t("confirm_delete")
+                ))
+                  return;
+                let d = { ...doc };
+                d[tableName][recordIndex][fieldName] = "", setDoc(d);
+              }), /* @__PURE__ */ jsxDEV30(
                 Field,
                 {
                   cls,
@@ -3423,20 +3489,22 @@ function DialogMultyGroup({
                   fieldRequired,
                   fieldDisabled,
                   fieldDict: fld.dicId,
-                  defaultVal: val
+                  defaultVal: val,
+                  handleDeleteFile,
+                  fieldScale: fld.scale
                 },
                 fld.id,
                 !1,
                 {
                   fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-                  lineNumber: 83,
+                  lineNumber: 95,
                   columnNumber: 33
                 },
                 this
               );
-            }) : /* @__PURE__ */ jsxDEV30(Fragment3, { children: "-" }, void 0, !1, {
+            }) : /* @__PURE__ */ jsxDEV30(Fragment2, { children: "-" }, void 0, !1, {
               fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-              lineNumber: 98,
+              lineNumber: 112,
               columnNumber: 30
             }, this)
           },
@@ -3444,13 +3512,13 @@ function DialogMultyGroup({
           !1,
           {
             fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-            lineNumber: 64,
+            lineNumber: 61,
             columnNumber: 21
           },
           this
         ) }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-          lineNumber: 63,
+          lineNumber: 60,
           columnNumber: 17
         }, this),
         /* @__PURE__ */ jsxDEV30(CardFooter3, { className: "pt-0 flex flex-row gap-3 justify-center", placeholder: "", children: [
@@ -3466,7 +3534,7 @@ function DialogMultyGroup({
             !1,
             {
               fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-              lineNumber: 102,
+              lineNumber: 116,
               columnNumber: 21
             },
             this
@@ -3482,19 +3550,19 @@ function DialogMultyGroup({
             !1,
             {
               fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-              lineNumber: 109,
+              lineNumber: 123,
               columnNumber: 21
             },
             this
           )
         ] }, void 0, !0, {
           fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-          lineNumber: 101,
+          lineNumber: 115,
           columnNumber: 17
         }, this)
       ] }, void 0, !0, {
         fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-        lineNumber: 62,
+        lineNumber: 59,
         columnNumber: 13
       }, this)
     },
@@ -3502,7 +3570,7 @@ function DialogMultyGroup({
     !1,
     {
       fileName: "app/components/UI/widgets/enter_data/dlg_multy_group.tsx",
-      lineNumber: 55,
+      lineNumber: 52,
       columnNumber: 9
     },
     this
@@ -3576,11 +3644,11 @@ function EnterDataView({
           lineNumber: 64,
           columnNumber: 21
         }, this),
-        /* @__PURE__ */ jsxDEV31(RecNavigator, { docs, current, setCurrent }, void 0, !1, {
+        docs.ids?.length ? /* @__PURE__ */ jsxDEV31(RecNavigator, { docs, current, setCurrent }, void 0, !1, {
           fileName: "app/components/UI/widgets/enter_data/view.tsx",
-          lineNumber: 65,
-          columnNumber: 21
-        }, this)
+          lineNumber: 66,
+          columnNumber: 27
+        }, this) : null
       ] }, void 0, !0, {
         fileName: "app/components/UI/widgets/enter_data/view.tsx",
         lineNumber: 63,
@@ -3603,7 +3671,7 @@ function EnterDataView({
         !1,
         {
           fileName: "app/components/UI/widgets/enter_data/view.tsx",
-          lineNumber: 67,
+          lineNumber: 69,
           columnNumber: 17
         },
         this
@@ -3632,7 +3700,7 @@ async function loader3({
 async function action2({
   request
 }) {
-  let ok = !1, errors = "", docs = null, deletedDocId = null, uploadHandler = unstable_composeUploadHandlers(
+  let ok = !1, errors, docs = null, deletedDocId = null, uploadHandler = unstable_composeUploadHandlers(
     unstable_createFileUploadHandler({
       directory: `${process.cwd()}/public/uploads`,
       file: ({ filename }) => filename,
@@ -3646,7 +3714,7 @@ async function action2({
     _id,
     ...values
   } = Object.fromEntries(formData);
-  switch (_action) {
+  switch (ok = !0, _action) {
     case "saveDocument": {
       try {
         let inputForm = await api_default.db.getInputForm(Number(_inputFormId));
@@ -3662,10 +3730,10 @@ async function action2({
     case "findDocument": {
       try {
         let inputForm = await api_default.db.getInputForm(Number(_inputFormId)), results = await api_default.doc.findDoc(inputForm, formData);
-        results.length > 100 ? errors = "Find records more 100" : (docs = {
+        docs = {
           formId: inputForm.id,
           ids: results.map((item) => item.id)
-        }, ok = !0);
+        };
       } catch (e) {
         if (e instanceof Prisma2.PrismaClientKnownRequestError)
           errors = e.message;
@@ -3676,7 +3744,7 @@ async function action2({
     }
     case "deleteDocument": {
       try {
-        _id && (await api_default.doc.deleteDoc(Number(_id)), deletedDocId = Number(_id), ok = !0);
+        _id ? (await api_default.doc.deleteDoc(Number(_id)), deletedDocId = Number(_id)) : (errors = "Unknown id", ok = !1);
       } catch (e) {
         if (e instanceof Prisma2.PrismaClientKnownRequestError)
           errors = e.message;
@@ -3715,7 +3783,7 @@ function EnterData() {
     !1,
     {
       fileName: "app/routes/dashboard.enter_data.$formId.tsx",
-      lineNumber: 136,
+      lineNumber: 134,
       columnNumber: 9
     },
     this
@@ -4135,7 +4203,7 @@ function DicValuesTable({
               lineNumber: 95,
               columnNumber: 29
             }, this)
-          ] }, item.id, !0, {
+          ] }, `${dictionary.id}_${item.id}`, !0, {
             fileName: "app/components/UI/widgets/dictionaries/tbl_dic_values.tsx",
             lineNumber: 52,
             columnNumber: 25
@@ -4471,7 +4539,7 @@ function ButtonAddSearchForm({ count }) {
 import MaterialTailwind5 from "@material-tailwind/react";
 import { Form as Form9, useFetcher } from "@remix-run/react";
 import { useTranslation as useTranslation24 } from "react-i18next";
-import { Fragment as Fragment4, jsxDEV as jsxDEV43 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment3, jsxDEV as jsxDEV43 } from "react/jsx-dev-runtime";
 var { Spinner } = MaterialTailwind5;
 function ButtonRestructDb() {
   let { t } = useTranslation24(), isRestruct = useFetcher().state !== "idle";
@@ -4488,7 +4556,7 @@ function ButtonRestructDb() {
           "Please confirm you want to restructure database."
         ) || event.preventDefault();
       },
-      children: isRestruct ? /* @__PURE__ */ jsxDEV43(Fragment4, { children: [
+      children: isRestruct ? /* @__PURE__ */ jsxDEV43(Fragment3, { children: [
         /* @__PURE__ */ jsxDEV43(Spinner, { className: "w-4 h-4" }, void 0, !1, {
           fileName: "app/components/UI/widgets/db_struct/buttons/btn_restruct_db.tsx",
           lineNumber: 32,
@@ -4500,7 +4568,7 @@ function ButtonRestructDb() {
         fileName: "app/components/UI/widgets/db_struct/buttons/btn_restruct_db.tsx",
         lineNumber: 31,
         columnNumber: 23
-      }, this) : /* @__PURE__ */ jsxDEV43(Fragment4, { children: [
+      }, this) : /* @__PURE__ */ jsxDEV43(Fragment3, { children: [
         /* @__PURE__ */ jsxDEV43("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.5, stroke: "currentColor", className: "w-4 h-4", children: /* @__PURE__ */ jsxDEV43("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" }, void 0, !1, {
           fileName: "app/components/UI/widgets/db_struct/buttons/btn_restruct_db.tsx",
           lineNumber: 37,
@@ -4571,7 +4639,7 @@ function Buttons4({
 }
 
 // app/components/UI/widgets/db_struct/navigator.tsx
-import { Link as Link2 } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { useTranslation as useTranslation25 } from "react-i18next";
 import { jsxDEV as jsxDEV45 } from "react/jsx-dev-runtime";
 function DbStructNav({
@@ -4604,7 +4672,7 @@ function DbStructNav({
             columnNumber: 21
           }, this),
           /* @__PURE__ */ jsxDEV45(
-            Link2,
+            Link,
             {
               to: "/dashboard/db_struct?state=inputForm&inputFormId=0",
               children: t("inputforms")
@@ -4633,7 +4701,7 @@ function DbStructNav({
       let formTitle = `${form.pos}. ${form[`title_${i18n.language}`]}`;
       return /* @__PURE__ */ jsxDEV45("div", { children: [
         /* @__PURE__ */ jsxDEV45(
-          Link2,
+          Link,
           {
             to: `/dashboard/db_struct?state=inputForm&inputFormId=${form.id}`,
             children: /* @__PURE__ */ jsxDEV45(
@@ -4678,7 +4746,7 @@ function DbStructNav({
         /* @__PURE__ */ jsxDEV45("ul", { children: form.groups.map((gr) => {
           let groupTitle = `${gr.pos}. ${gr[`title_${i18n.language}`]}`;
           return /* @__PURE__ */ jsxDEV45(
-            Link2,
+            Link,
             {
               to: `/dashboard/db_struct?state=group&inputFormId=${gr.inputFormId}&groupId=${gr.id}`,
               children: /* @__PURE__ */ jsxDEV45(
@@ -4753,7 +4821,7 @@ function DbStructNav({
             columnNumber: 21
           }, this),
           /* @__PURE__ */ jsxDEV45(
-            Link2,
+            Link,
             {
               to: "/dashboard/db_struct?state=searchForm&searchFormId=0",
               children: t("searchforms")
@@ -4781,7 +4849,7 @@ function DbStructNav({
     /* @__PURE__ */ jsxDEV45("ul", { children: searchForms.map((form) => {
       let formTitle = `${form.pos}. ${form[`title_${i18n.language}`]}`;
       return /* @__PURE__ */ jsxDEV45(
-        Link2,
+        Link,
         {
           to: `/dashboard/db_struct?state=searchForm&searchFormId=${form.id}`,
           children: /* @__PURE__ */ jsxDEV45(
@@ -4846,7 +4914,7 @@ function DbStructNav({
             columnNumber: 21
           }, this),
           /* @__PURE__ */ jsxDEV45(
-            Link2,
+            Link,
             {
               to: "/dashboard/db_struct?state=dictionary&dictionaryId=0",
               children: t("dictionaries")
@@ -4874,7 +4942,7 @@ function DbStructNav({
     /* @__PURE__ */ jsxDEV45("ul", { children: dictionaries.map((dict) => {
       let dicTitle = dict[`title_${i18n.language}`];
       return /* @__PURE__ */ jsxDEV45(
-        Link2,
+        Link,
         {
           to: `/dashboard/db_struct?state=dictionary&dictionaryId=${dict.id}`,
           children: /* @__PURE__ */ jsxDEV45(
@@ -4935,14 +5003,14 @@ function DbStructNav({
 // app/components/UI/widgets/db_struct/forms/form_dict.tsx
 import { Form as Form10 } from "@remix-run/react";
 import { useTranslation as useTranslation26 } from "react-i18next";
-import { Fragment as Fragment5, jsxDEV as jsxDEV46 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment4, jsxDEV as jsxDEV46 } from "react/jsx-dev-runtime";
 function DictionaryForm({ dictionary }) {
   let { i18n, t } = useTranslation26(), handleDelete = async (event) => {
     confirm(
       t("confirm_delete")
     ) || event.preventDefault();
   };
-  return /* @__PURE__ */ jsxDEV46(Fragment5, { children: [
+  return /* @__PURE__ */ jsxDEV46(Fragment4, { children: [
     /* @__PURE__ */ jsxDEV46("div", { className: "flex flex-row gap-3 justify-end", children: [
       /* @__PURE__ */ jsxDEV46(
         CustomButton,
@@ -5101,14 +5169,14 @@ function DictionaryForm({ dictionary }) {
 import { Form as Form11, useNavigate as useNavigate8 } from "@remix-run/react";
 import { FieldType } from "@prisma/client";
 import { useTranslation as useTranslation27 } from "react-i18next";
-import { Fragment as Fragment6, jsxDEV as jsxDEV47 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment5, jsxDEV as jsxDEV47 } from "react/jsx-dev-runtime";
 function GroupForm({ group, dicts }) {
   let { i18n, t } = useTranslation27(), navigate = useNavigate8(), handleDelete = async (event) => {
     confirm(
       t("confirm_delete")
     ) || event.preventDefault();
   };
-  return /* @__PURE__ */ jsxDEV47(Fragment6, { children: [
+  return /* @__PURE__ */ jsxDEV47(Fragment5, { children: [
     /* @__PURE__ */ jsxDEV47("div", { className: "flex flex-row gap-3 justify-end", children: [
       /* @__PURE__ */ jsxDEV47(
         CustomButton,
@@ -5473,7 +5541,7 @@ function GroupForm({ group, dicts }) {
               lineNumber: 174,
               columnNumber: 29
             }, this),
-            /* @__PURE__ */ jsxDEV47("th", { className: "p-1 text-sm border", children: t("precision") }, void 0, !1, {
+            /* @__PURE__ */ jsxDEV47("th", { className: "p-1 text-sm border", children: t("scale") }, void 0, !1, {
               fileName: "app/components/UI/widgets/db_struct/forms/form_group.tsx",
               lineNumber: 175,
               columnNumber: 29
@@ -5784,8 +5852,8 @@ function GroupForm({ group, dicts }) {
             className: "text-sm w-full focus:outline-none",
             form: `updateInputFieldForm_${field.id}`,
             type: "number",
-            name: "precision",
-            defaultValue: field.precision,
+            name: "scale",
+            defaultValue: field.scale,
             onChange: () => {
               document.getElementById(`updateInputFieldButton_${field.id}`).click();
             }
@@ -6100,10 +6168,10 @@ function GroupForm({ group, dicts }) {
 // app/components/UI/widgets/db_struct/forms/form_input.tsx
 import { Form as Form12 } from "@remix-run/react";
 import { useTranslation as useTranslation28 } from "react-i18next";
-import { Fragment as Fragment7, jsxDEV as jsxDEV48 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment6, jsxDEV as jsxDEV48 } from "react/jsx-dev-runtime";
 function InputFormForm({ inputForm, groups }) {
   let { t } = useTranslation28();
-  return /* @__PURE__ */ jsxDEV48(Fragment7, { children: [
+  return /* @__PURE__ */ jsxDEV48(Fragment6, { children: [
     /* @__PURE__ */ jsxDEV48("div", { className: "flex flex-row gap-3 justify-end", children: [
       /* @__PURE__ */ jsxDEV48(
         CustomButton,
@@ -6355,14 +6423,14 @@ function InputFormForm({ inputForm, groups }) {
 // app/components/UI/widgets/db_struct/forms/form_search.tsx
 import { Form as Form13 } from "@remix-run/react";
 import { useTranslation as useTranslation29 } from "react-i18next";
-import { Fragment as Fragment8, jsxDEV as jsxDEV49 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment7, jsxDEV as jsxDEV49 } from "react/jsx-dev-runtime";
 function SearchFormForm({ searchForm, inputFields }) {
   let { i18n, t } = useTranslation29(), handleDelete = async (event) => {
     confirm(
       t("confirm_delete")
     ) || event.preventDefault();
   };
-  return /* @__PURE__ */ jsxDEV49(Fragment8, { children: [
+  return /* @__PURE__ */ jsxDEV49(Fragment7, { children: [
     /* @__PURE__ */ jsxDEV49("div", { className: "flex flex-row gap-3 justify-end", children: [
       /* @__PURE__ */ jsxDEV49(
         CustomButton,
@@ -7234,7 +7302,7 @@ async function action4({
         isVisible: Boolean(values.isVisible),
         isEnable: Boolean(values.isEnable),
         isRequire: Boolean(values.isRequire),
-        precision: Number(values.precision),
+        scale: Number(values.scale),
         isDuplicate: Boolean(values.isDuplicate)
       }), redirect3(`/dashboard/db_struct?state=group&inputFormId=${values.inputFormId}&groupId=${values.groupId}`);
     } catch (e) {
@@ -8101,10 +8169,10 @@ function ButtonDeleteRole({ roleId }) {
 }
 
 // app/components/UI/widgets/users/tbl_roles.tsx
-import { Fragment as Fragment9, jsxDEV as jsxDEV59 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment8, jsxDEV as jsxDEV59 } from "react/jsx-dev-runtime";
 function RolesTable({ role, roles }) {
   let navigate = useNavigate12(), { i18n, t } = useTranslation36();
-  return /* @__PURE__ */ jsxDEV59(Fragment9, { children: [
+  return /* @__PURE__ */ jsxDEV59(Fragment8, { children: [
     roles.map((role2) => /* @__PURE__ */ jsxDEV59(
       Form17,
       {
@@ -8376,10 +8444,10 @@ function ButtonDeleteAccessInputForm({ aform }) {
 }
 
 // app/components/UI/widgets/users/tbl_ainputforms.tsx
-import { Fragment as Fragment10, jsxDEV as jsxDEV61 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment9, jsxDEV as jsxDEV61 } from "react/jsx-dev-runtime";
 function AccessInputFormsTable({ aforms, inputForms }) {
   let { i18n, t } = useTranslation38();
-  return /* @__PURE__ */ jsxDEV61(Fragment10, { children: [
+  return /* @__PURE__ */ jsxDEV61(Fragment9, { children: [
     aforms && aforms.map((aform) => /* @__PURE__ */ jsxDEV61(
       Form19,
       {
@@ -8786,10 +8854,10 @@ function ButtonDeleteAccessSearchForm({ aform }) {
 }
 
 // app/components/UI/widgets/users/tbl_asearchforms.tsx
-import { Fragment as Fragment11, jsxDEV as jsxDEV66 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment10, jsxDEV as jsxDEV66 } from "react/jsx-dev-runtime";
 function AccessSearchFormsTable({ aforms, searchForms }) {
   let { i18n, t } = useTranslation43();
-  return /* @__PURE__ */ jsxDEV66(Fragment11, { children: [
+  return /* @__PURE__ */ jsxDEV66(Fragment10, { children: [
     aforms && aforms.map((aform) => /* @__PURE__ */ jsxDEV66(
       Form24,
       {
@@ -9117,10 +9185,10 @@ function ButtonDeleteUserRole({ userRoleId, userId }) {
 
 // app/components/UI/widgets/users/tbl_roles_only_title.tsx
 import { Form as Form26 } from "@remix-run/react";
-import { Fragment as Fragment12, jsxDEV as jsxDEV69 } from "react/jsx-dev-runtime";
+import { Fragment as Fragment11, jsxDEV as jsxDEV69 } from "react/jsx-dev-runtime";
 function RolesOnlyTitleTable({ userRoles, roles }) {
   let { i18n, t } = useTranslation46();
-  return /* @__PURE__ */ jsxDEV69(Fragment12, { children: [
+  return /* @__PURE__ */ jsxDEV69(Fragment11, { children: [
     userRoles && userRoles.map((ur) => /* @__PURE__ */ jsxDEV69(
       Form26,
       {
@@ -9964,9 +10032,9 @@ import { Outlet as Outlet2 } from "@remix-run/react";
 import MaterialTailwind10 from "@material-tailwind/react";
 
 // app/components/UI/elements/logo.tsx
-import { Link as Link3 } from "@remix-run/react";
+import { Link as Link2 } from "@remix-run/react";
 import { jsxDEV as jsxDEV73 } from "react/jsx-dev-runtime";
-var Logo = () => /* @__PURE__ */ jsxDEV73(Link3, { to: "/dashboard", className: "flex gap-3", children: [
+var Logo = () => /* @__PURE__ */ jsxDEV73(Link2, { to: "/dashboard", className: "flex gap-3", children: [
   /* @__PURE__ */ jsxDEV73(
     "img",
     {
@@ -9999,9 +10067,9 @@ import MaterialTailwind9 from "@material-tailwind/react";
 
 // app/components/UI/widgets/dashboard/menu/nav_list_menu.tsx
 import MaterialTailwind8 from "@material-tailwind/react";
-import { Fragment as Fragment13, createElement, useState as useState7 } from "react";
+import { Fragment as Fragment12, createElement, useState as useState7 } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { Link as Link4 } from "@remix-run/react";
+import { Link as Link3 } from "@remix-run/react";
 import { jsxDEV as jsxDEV74 } from "react/jsx-dev-runtime";
 var {
   Collapse,
@@ -10037,7 +10105,7 @@ function NavListMenu({ menuTitle, navListMenuItems }) {
               className: "flex items-center text-sm font-bold text-primary",
               variant: "h6",
               placeholder: "",
-              children: /* @__PURE__ */ jsxDEV74(Link4, { to: link, children: title }, void 0, !1, {
+              children: /* @__PURE__ */ jsxDEV74(Link3, { to: link, children: title }, void 0, !1, {
                 fileName: "app/components/UI/widgets/dashboard/menu/nav_list_menu.tsx",
                 lineNumber: 47,
                 columnNumber: 29
@@ -10072,7 +10140,7 @@ function NavListMenu({ menuTitle, navListMenuItems }) {
       columnNumber: 13
     }, this)
   );
-  return /* @__PURE__ */ jsxDEV74(Fragment13, { children: [
+  return /* @__PURE__ */ jsxDEV74(Fragment12, { children: [
     /* @__PURE__ */ jsxDEV74(
       Menu,
       {
@@ -10556,14 +10624,14 @@ __export(index_exports, {
   default: () => Index,
   meta: () => meta
 });
-import { Link as Link5 } from "@remix-run/react";
+import { Link as Link4 } from "@remix-run/react";
 import { jsxDEV as jsxDEV80 } from "react/jsx-dev-runtime";
 var meta = () => [
   { title: "New Remix App" },
   { name: "description", content: "Welcome to Remix!" }
 ];
 function Index() {
-  return /* @__PURE__ */ jsxDEV80("div", { children: /* @__PURE__ */ jsxDEV80(Link5, { to: "/dashboard", children: "Dashboard" }, void 0, !1, {
+  return /* @__PURE__ */ jsxDEV80("div", { children: /* @__PURE__ */ jsxDEV80(Link4, { to: "/dashboard", children: "Dashboard" }, void 0, !1, {
     fileName: "app/routes/_index.tsx",
     lineNumber: 14,
     columnNumber: 7
@@ -10575,7 +10643,7 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-QR2IZ3WB.js", imports: ["/build/_shared/chunk-OAPPX4FA.js", "/build/_shared/chunk-Z46RVADL.js", "/build/_shared/chunk-AX7SAOSU.js", "/build/_shared/chunk-7PHB3BFD.js", "/build/_shared/chunk-FQWAC4DA.js", "/build/_shared/chunk-SOESSFXD.js", "/build/_shared/chunk-JR22VO6P.js", "/build/_shared/chunk-WEAPBHQG.js", "/build/_shared/chunk-CJ4MY3PQ.js", "/build/_shared/chunk-PZDJHGND.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-V23H7CSP.js", imports: void 0, hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-JCFTVRU3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard": { id: "routes/dashboard", parentId: "root", path: "dashboard", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard-VQRACQF4.js", imports: void 0, hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.db_struct": { id: "routes/dashboard.db_struct", parentId: "routes/dashboard", path: "db_struct", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.db_struct-QZEH5X42.js", imports: ["/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.dictionaries": { id: "routes/dashboard.dictionaries", parentId: "routes/dashboard", path: "dictionaries", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.dictionaries-3KN53QRW.js", imports: ["/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.enter_data.$formId": { id: "routes/dashboard.enter_data.$formId", parentId: "routes/dashboard", path: "enter_data/:formId", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.enter_data.$formId-5RTYHYYB.js", imports: ["/build/_shared/chunk-255ORAUR.js", "/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.search_data.$formId": { id: "routes/dashboard.search_data.$formId", parentId: "routes/dashboard", path: "search_data/:formId", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.search_data.$formId-N5TB5HSY.js", imports: ["/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.users": { id: "routes/dashboard.users", parentId: "routes/dashboard", path: "users", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.users-BMBLX4PO.js", imports: ["/build/_shared/chunk-255ORAUR.js", "/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-RAAIBPHZ.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "9507dc88", hmr: { runtime: "/build/_shared/chunk-SOESSFXD.js", timestamp: 1710846922601 }, url: "/build/manifest-9507DC88.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-QR2IZ3WB.js", imports: ["/build/_shared/chunk-OAPPX4FA.js", "/build/_shared/chunk-Z46RVADL.js", "/build/_shared/chunk-AX7SAOSU.js", "/build/_shared/chunk-7PHB3BFD.js", "/build/_shared/chunk-FQWAC4DA.js", "/build/_shared/chunk-SOESSFXD.js", "/build/_shared/chunk-JR22VO6P.js", "/build/_shared/chunk-WEAPBHQG.js", "/build/_shared/chunk-CJ4MY3PQ.js", "/build/_shared/chunk-PZDJHGND.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-DWQOXE4R.js", imports: void 0, hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-JCFTVRU3.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard": { id: "routes/dashboard", parentId: "root", path: "dashboard", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard-VQRACQF4.js", imports: void 0, hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.db_struct": { id: "routes/dashboard.db_struct", parentId: "routes/dashboard", path: "db_struct", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.db_struct-DFBXA5V7.js", imports: ["/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-2ZEFIZFL.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.dictionaries": { id: "routes/dashboard.dictionaries", parentId: "routes/dashboard", path: "dictionaries", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.dictionaries-HNLQ3F62.js", imports: ["/build/_shared/chunk-2ZEFIZFL.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.enter_data.$formId": { id: "routes/dashboard.enter_data.$formId", parentId: "routes/dashboard", path: "enter_data/:formId", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.enter_data.$formId-VFU25TD7.js", imports: ["/build/_shared/chunk-255ORAUR.js", "/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-2ZEFIZFL.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.search_data.$formId": { id: "routes/dashboard.search_data.$formId", parentId: "routes/dashboard", path: "search_data/:formId", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.search_data.$formId-RHGEVPSL.js", imports: ["/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-2ZEFIZFL.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/dashboard.users": { id: "routes/dashboard.users", parentId: "routes/dashboard", path: "users", index: void 0, caseSensitive: void 0, module: "/build/routes/dashboard.users-R46LVHFW.js", imports: ["/build/_shared/chunk-255ORAUR.js", "/build/_shared/chunk-KJDVWT2A.js", "/build/_shared/chunk-2ZEFIZFL.js"], hasAction: !0, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "0b51c18c", hmr: { runtime: "/build/_shared/chunk-SOESSFXD.js", timestamp: 1710937889560 }, url: "/build/manifest-0B51C18C.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "development", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {

@@ -1,5 +1,5 @@
 import { InputField } from "@prisma/client"
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, MouseEvent, SetStateAction } from "react"
 import Field from "./field"
 import { useTranslation } from "react-i18next"
 
@@ -11,7 +11,7 @@ type SingleGroupProps = {
     setDoc: Dispatch<SetStateAction<any>>,
 }
 export default function SingleGroup({ state, dictionaries, group, doc, setDoc }: SingleGroupProps) {
-    const { i18n } = useTranslation()
+    const { i18n, t } = useTranslation()
 
     return (
         <div className="border p-1 grid grid-cols-3 gap-1">
@@ -26,6 +26,21 @@ export default function SingleGroup({ state, dictionaries, group, doc, setDoc }:
                 let val = ''
                 if (doc[tableName].length) {
                     val = doc[tableName][0][fieldName]
+                }
+                let handleDeleteFile
+                if (fld.fieldType === 'FILE') {
+                    handleDeleteFile = (e: MouseEvent<HTMLButtonElement>) => {
+                        e.preventDefault()
+                        const response = confirm(
+                            t('confirm_delete')
+                        )
+                        if (!response) {
+                            return
+                        }
+                        let d = { ...doc }
+                        d[tableName][0][fieldName] = ""
+                        setDoc(d)
+                    }
                 }
 
                 return (
@@ -42,6 +57,8 @@ export default function SingleGroup({ state, dictionaries, group, doc, setDoc }:
                         fieldDisabled={fieldDisabled}
                         fieldDict={fld.dicId}
                         defaultVal={val}
+                        handleDeleteFile={handleDeleteFile}
+                        fieldScale={fld.scale}
                     />
                 )
             })}

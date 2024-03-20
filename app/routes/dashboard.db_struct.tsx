@@ -220,7 +220,7 @@ export async function action({
                 isVisible: Boolean(values.isVisible),
                 isEnable: Boolean(values.isEnable),
                 isRequire: Boolean(values.isRequire),
-                precision: Number(values.precision),
+                scale: Number(values.scale),
                 isDuplicate: Boolean(values.isDuplicate),
             })
             return redirect(`/dashboard/db_struct?state=group&inputFormId=${values.inputFormId}&groupId=${values.groupId}`)

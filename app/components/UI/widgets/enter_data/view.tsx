@@ -62,7 +62,9 @@ export default function EnterDataView({
             <Panel className="h-full overflow-auto">
                 <div className="py-2 flex justify-between items-center">
                     <Buttons userId={userId} inputFormId={inputForm.id} doc={doc} state={state} />
-                    <RecNavigator docs={docs} current={current} setCurrent={setCurrent} />
+                    {docs.ids?.length
+                        ? <RecNavigator docs={docs} current={current} setCurrent={setCurrent} />
+                        : null}
                 </div>
                 <EditForm
                     formRef={formRef}

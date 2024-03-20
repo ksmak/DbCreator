@@ -123,6 +123,7 @@ export default function DocModule(prisma: PrismaClient) {
             return prisma.$transaction(tr)
         },
         updateDoc(userId: number | null, inputForm: any, formData: FormData, docId: number) {
+            let sql = ""
             let tr = []
             tr.push(
                 prisma.doc.update({
@@ -164,8 +165,16 @@ export default function DocModule(prisma: PrismaClient) {
                                         vals = vals + `, '${fieldVal}'`
                                         break
                                     case "FILE":
-                                        let file = fieldVal as File
-                                        vals = vals + `, '/uploads/${file.name}'`
+                                        if (typeof (fieldVal) === 'string' && fieldVal !== "") {
+                                            vals = vals + `, '${fieldVal}'`
+                                        } else {
+                                            let file = fieldVal as File
+                                            if (file.size > 0) {
+                                                vals = vals + `, '/uploads/${file.name}'`
+                                            } else {
+                                                vals = vals + ", null"
+                                            }
+                                        }
                                         break
                                     default:
                                         vals = vals + `, ${fieldVal}`
@@ -173,38 +182,45 @@ export default function DocModule(prisma: PrismaClient) {
                                 }
                             }
                         }
-                        tr.push(prisma.$executeRawUnsafe(`INSERT INTO ${tableName}(${flds}) VALUES(${vals})`))
+                        sql = `INSERT INTO ${tableName}(${flds}) VALUES(${vals})`
+                        tr.push(prisma.$executeRawUnsafe(sql))
                     }
                 } else {
-                    tr.push(prisma.$executeRawUnsafe(`DELETE FROM ${tableName} WHERE sid=${docId}`))
-                    let sets = " SET "
                     let id = formData.get(`${tableName}__id`)
+                    let sets = "lst=0"
                     for (const field of group.fields) {
                         const fieldName = `f${field.id}`
                         const fieldVal = formData.get(`${tableName}__${fieldName}__${0}`)
                         if (['null', ''].includes(String(fieldVal))) {
-                            sets = sets + `, ${fieldName} = null`
+                            sets = sets + `, ${fieldName}=null`
                         } else {
                             switch (field.fieldType) {
                                 case "TEXT":
                                 case "CYRILLIC":
                                 case "DATE":
                                 case "TIME":
-                                    sets = sets + `, ${fieldName} = '${fieldVal}'`
+                                    sets = sets + `, ${fieldName}='${fieldVal}'`
                                     break
                                 case "FILE":
-                                    let file = fieldVal as File
-                                    if (file.name) {
-                                        sets = sets + `, ${fieldName} = '/uploads/${file.name}'`
+                                    if (typeof (fieldVal) === 'string' && fieldVal !== "") {
+                                        sets = sets + `, ${fieldName}='${fieldVal}'`
+                                    } else {
+                                        let file = fieldVal as File
+                                        if (file.size > 0) {
+                                            sets = sets + `, ${fieldName}='/uploads/${file.name}'`
+                                        } else {
+                                            sets = sets + `, ${fieldName}=null`
+                                        }
                                     }
                                     break
                                 default:
-                                    sets = sets + `, ${fieldName} = ${fieldVal}`
+                                    sets = sets + `, ${fieldName}=${fieldVal}`
                                     break
                             }
                         }
                     }
-                    tr.push(prisma.$executeRawUnsafe(`UPDATE ${tableName} SET ${sets}) WHERE id={id}`))
+                    sql = `UPDATE ${tableName} SET ${sets} WHERE id=${id}`
+                    tr.push(prisma.$executeRawUnsafe(sql))
                 }
             }
             return prisma.$transaction(tr)
@@ -222,7 +238,7 @@ export default function DocModule(prisma: PrismaClient) {
                     for (const field of group.fields) {
                         const fieldName = `f${field.id}`
                         let fieldVal = formData.get(`${tableName}__${fieldName}__${i}`)
-                        if (fieldVal) {
+                        if (fieldVal && field.fieldType !== 'FILE') {
                             if (!tbls.includes(tableName)) {
                                 tbls.push(tableName)
                                 where = where + ` AND doc.id = ${tableName}.sid`
@@ -234,9 +250,6 @@ export default function DocModule(prisma: PrismaClient) {
                                 case "DATE":
                                 case "TIME":
                                     where = where + ' AND ' + `${fieldName} = '${fieldVal}'`
-                                    break
-                                case "FILE":
-                                    where = where + ' AND ' + `${fieldName} = '/uploads/${(fieldVal as File).name}'`
                                     break
                                 default:
                                     where = where + ' AND ' + `${fieldName} = ${fieldVal}`

@@ -52,6 +52,7 @@ export default function EditForm({
                 }
             })
         console.log(Object.fromEntries(formData))
+        console.log(doc)
         submit(formData, {
             method: 'post',
             encType: 'multipart/form-data'
